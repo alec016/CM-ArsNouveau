@@ -1,147 +1,192 @@
 plugins {
     id "architectury-plugin" version "3.4-SNAPSHOT"
-    id "dev.architectury.loom" version "1.1-SNAPSHOT" apply false
-    id "io.github.p03w.machete" version "1.+" // automatic jar compressing on build
-    id "me.shedaniel.unified-publishing" version "0.1.+" apply false
-    id 'com.diffplug.spotless' version '5.12.5' apply false
+    id "dev.architectury.loom" version "1.3+"
+    id "me.shedaniel.unified-publishing" version "0.1.+"
+}
+
+sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
+
+archivesBaseName = project.archives_base_name
+version = project.mod_version
+group = project.maven_group
+
+loom {
+    silentMojangMappingsLicense()
+    forge {
+        mixinConfig "custommachineryars.mixins.json"
+
+        dataGen {
+            mod project.modid
+        }
+    }
 }
 
 architectury {
-    minecraft = rootProject.minecraft_version
+    forge()
 }
 
-subprojects {
-    apply plugin: "dev.architectury.loom"
-    apply plugin: "com.diffplug.spotless"
-
-    repositories {
-        mavenCentral()
-        maven { url = "https://maven.shedaniel.me/" } // Cloth Config, REI
-        maven { url = "https://dvs1.progwml6.com/files/maven/" } // JEI
-        maven { url = "https://maven.parchmentmc.org" } // Parchment mappings
-        maven { url = "https://maven.quiltmc.org/repository/release" } // Quilt Mappings
-        maven {
-            name = 'BlameJared Maven'
-            url = 'https://maven.blamejared.com'
+repositories {
+    maven {
+        name = "Custom Machinery maven"
+        url = "https://maven.frinn.fr/repository/maven/"
+        content {
+            includeGroup "frinn.custommachinery"
+        }
+    }
+    maven {
+        name = "Mod maven"
+        url = "https://modmaven.dev/"
+        content {
+            includeGroup "mcjty.theoneprobe"
+        }
+    }
+    maven {
+        name = "Shedaniel maven"
+        url = "https://maven.architectury.dev/"
+    }
+    maven {
+        name = "Saps maven"
+        url = "https://maven.saps.dev/minecraft"
+        content {
+            includeGroup "dev.latvian.mods"
+            includeGroup "dev.ftb.mods"
+        }
+    }
+    maven {
+        // location of the maven that hosts JEI files
+        name = "Progwml6 maven"
+        url = "https://dvs1.progwml6.com/files/maven/"
+        content {
+            includeGroup "mezz.jei"
+        }
+    }
+    maven {
+        name = 'BlameJared Maven'
+        url = 'https://maven.blamejared.com'
+    }
+    maven {
+        name = "ldtteam Maven"
+        url = "https://ldtteam.jfrog.io/ldtteam/modding/"
+        content {
+            includeGroup "com.communi-suggestu.saecularia-caudices"
         }
     }
 
-    loom {
-        silentMojangMappingsLicense()
-    }
+    maven { url = "https://maven.theillusivec4.top/" } // Curios
+}
 
-    dependencies {
-        minecraft "com.mojang:minecraft:${minecraft_version}"
-        // layered mappings - Mojmap names, parchment and QM docs and parameters
-        mappings(loom.layered {
-            it.parchment("org.parchmentmc.data:parchment-${minecraft_version}:${parchment_version}@zip")
-            it.officialMojangMappings { nameSyntheticMembers = false }
-        })
+dependencies {
+    // Minecraft
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
 
-        // see each subproject for dependencies.
+    // Official mappings
+    mappings loom.officialMojangMappings()
+
+    forge("net.minecraftforge:forge:${project.minecraft_version}-${project.forge_version}")
+    modApi("dev.architectury:architectury-forge:${project.architectury_version}")
+
+    // ars
+    modLocalRuntime "vazkii.patchouli:Patchouli:${minecraft_version}-77"
+    modLocalRuntime "top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0"
+    modImplementation("com.hollingsworth.ars_nouveau:ars_nouveau-${project.minecraft_version}:${project.ars_version}")
+
+    // JEI 10
+    modCompileOnly("mezz.jei:jei-${project.minecraft_version}-common-api:${project.jei_version}")
+    modCompileOnly("mezz.jei:jei-${project.minecraft_version}-forge-api:${project.jei_version}")
+    modImplementation("mezz.jei:jei-${project.minecraft_version}-forge:${project.jei_version}") {transitive = false}
+
+    // Custom Machinery
+    modApi "frinn.custommachinery:CustomMachinery-api:${project.minecraft_version}-${project.custommachinery_version}"
+    modApi "frinn.custommachinery:CustomMachinery-common:${project.minecraft_version}-${project.custommachinery_version}"
+    modLocalRuntime "frinn.custommachinery:CustomMachinery-forge:${project.minecraft_version}-${project.custommachinery_version}"
+
+    //KubeJS
+    modLocalRuntime modCompileOnly("dev.latvian.mods:kubejs-forge:${project.kubejs_version}")
+    localRuntime("io.github.llamalad7:mixinextras-forge:0.2.0-rc.4")
+
+    //Crafttweaker
+    modLocalRuntime modCompileOnly("com.blamejared.crafttweaker:CraftTweaker-forge-${project.minecraft_version}:${project.ct_version}")
+
+    //The one probe
+    modLocalRuntime("mcjty.theoneprobe:theoneprobe:${project.top_version}") {transitive = false}
+}
+
+processResources {
+    inputs.property "version", project.version
+
+    filesMatching("META-INF/mods.toml") {
+        expand "modid": project.modid,
+                "mod_version": project.mod_version,
+                "mod_name": project.mod_name,
+                "mod_description": project.mod_description,
+                "author": project.author,
+                "issues": project.issues,
+                "license": project.license,
+                "icon": project.icon,
+                "minecraft_version": project.minecraft_version,
+                "architectury_version": project.architectury_version,
+                "custommachinery_version": project.custommachinery_version,
+                "ars_version": project.ars_version
     }
 }
 
-allprojects {
-    apply plugin: "java"
-    apply plugin: "architectury-plugin"
-    apply plugin: "maven-publish"
+tasks.withType(JavaCompile) {
+    // ensure that the encoding is set to UTF-8, no matter what the system default is
+    // this fixes some edge cases with special characters not displaying correctly
+    // see http://yodaconditions.net/blog/fix-for-java-file-encoding-problems-with-gradle.html
+    // If Javadoc is generated, this must be specified in that task too.
+    options.encoding = "UTF-8"
+    options.release = 17
+}
 
-    archivesBaseName = "${project.archives_base_name}-${project.name}"
-    version = "${project.minecraft_version}-${project.mod_version}"
-    group = project.maven_group
+java {
+    // Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task
+    // if it is present.
+    // If you remove this line, sources will not be generated.
+    withSourcesJar()
+}
 
-    repositories {
-        maven {
-            name = "Custom Machinery maven"
-            url = "https://maven.frinn.fr/repository/maven/"
-            content {
-                includeGroup "frinn.custommachinery"
-            }
+jar {
+    // add some additional metadata to the jar manifest
+    manifest {
+        attributes([
+                "Specification-Title"     : project.modid,
+                "Specification-Vendor"    : project.author,
+                "Specification-Version"   : "1",
+                "Implementation-Title"    : project.mod_name,
+                "Implementation-Version"  : version,
+                "Implementation-Vendor"   : project.author,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+unifiedPublishing {
+    project {
+        displayName = "Custom-Machinery-ArsNouveau-${project.minecraft_version}-${project.mod_version}"
+        releaseType = "release"
+        if(rootProject.file("CHANGELOG.md").exists()) {
+            changelog = rootProject.file("CHANGELOG.md").text
         }
-        maven {
-            name = "Latvian maven"
-            url = "https://maven.saps.dev/minecraft"
-            content {
-                includeGroup "dev.latvian.mods"
-                includeGroup "dev.ftb.mods"
-            }
-        }
-        maven {
-            name = "ldtteam Maven"
-            url = "https://ldtteam.jfrog.io/ldtteam/modding/"
-            content {
-                includeGroup "com.communi-suggestu.saecularia-caudices"
-            }
-        }
-        maven {
-            name = "C4"
-            url = "https://maven.theillusivec4.top/"
-        }
-        maven {
-            name = "Unascribed"
-            url "https://repo.unascribed.com" // for ears
-            content {
-                includeGroup "com.unascribed"
+        gameVersions = ["${project.minecraft_version}"]
+        gameLoaders = ["forge"]
+        mainPublication remapJar
+
+        var CURSE_API_KEY = System.getenv("CURSEFORGE_KEY")
+        if (CURSE_API_KEY != null) {
+            curseforge {
+                token = CURSE_API_KEY
+                id = "969074"
+                gameVersions.addAll "Java 17"
+                relations {
+                    depends "architectury-api"
+                    depends "cloth-config"
+                    depends "custom-machinery"
+                    depends "ars-nouveau"
+                    optional "crafttweaker"
+                    optional "kubejs"
+                }
             }
         }
     }
-
-    tasks.withType(JavaCompile) {
-        options.encoding = "UTF-8"
-    }
-
-    java {
-        withSourcesJar()
-    }
-
-//    if(project.path != ':common' && project.path != ':') {
-//        publishing {
-//            publications {
-//                maven(MavenPublication) {
-//                    groupId = project.group
-//                    artifactId = project.archivesBaseName
-//                    version = project.version
-//                    from components.java
-//
-//                    pom {
-//                        name = project.mod_name
-//                        description = project.mod_description
-//                        packaging = 'jar'
-//                        version = project.version
-//                        scm {
-//                            url = project.github
-//                        }
-//                        issueManagement {
-//                            system = 'github'
-//                            url = project.issues
-//                        }
-//                        licenses {
-//                            license {
-//                                name = project.license
-//                                distribution = 'repo'
-//                            }
-//                        }
-//                        developers {
-//                            developer {
-//                                id = project.author
-//                                name = project.author
-//                                roles = ['developper']
-//                            }
-//                        }
-//                    }
-//                }
-//            }
-//            repositories {
-//                maven {
-//                    name = 'maven'
-//                    url = 'https://maven.frinn.fr/repository/maven/'
-//                    credentials {
-//                        username = 'frinn'
-//                        password = System.getenv('MAVEN_PASSWORD')
-//                    }
-//                }
-//            }
-//        }
-//    }
 }

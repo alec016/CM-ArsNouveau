@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "al.alec.custommachineryars.mixin",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+    "CustomCraftRecipeBuilderJS",
+    "CustomMachineRecipeBuilderJSMixin",
+    "CustomMachineTileMixin",
+    "RelayTileMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

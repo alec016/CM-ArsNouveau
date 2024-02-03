@@ -10,6 +10,7 @@
     "RelayTileMixin"
   ],
   "client": [
+    "client.ModelBakeryAccessor"
   ],
   "injectors": {
     "defaultRequire": 1

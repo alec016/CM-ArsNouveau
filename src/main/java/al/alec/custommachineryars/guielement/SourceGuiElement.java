@@ -20,7 +20,7 @@ public class SourceGuiElement extends AbstractTexturedGuiElement implements ICom
         makePropertiesCodec().forGetter(AbstractGuiElement::getProperties),
         NamedCodec.BOOL.optionalFieldOf("highlight", true).forGetter(SourceGuiElement::highlight)
       ).apply(manaGuiElement, SourceGuiElement::new),
-    "Mana gui element"
+    "Source gui element"
   );
   private final boolean highlight;
 

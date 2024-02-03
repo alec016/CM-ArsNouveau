@@ -13,7 +13,4 @@ public interface ModelBakeryAccessor {
   static Set<Material> getMaterials() {
     throw new IllegalStateException();
   }
-
-  @Accessor("atlasSet")
-  AtlasSet getSpriteAtlasManager();
 }

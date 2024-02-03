@@ -35,7 +35,7 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 @Mod(CustomMachineryArsNouveau.MODID)
 public class CustomMachineryArsNouveau {
   public static final String MODID = "custommachineryars";
-  public static final Material source = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation("ars_nouveau", "block/source_still"));
+  public static final Material source = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(MODID, "block/source_still"));
 
   public CustomMachineryArsNouveau() {
     final IEventBus MOD_BUS = FMLJavaModLoadingContext.get().getModEventBus();
@@ -43,6 +43,7 @@ public class CustomMachineryArsNouveau {
     Registration.GUI_ELEMENTS.register(MOD_BUS);
     Registration.MACHINE_COMPONENTS.register(MOD_BUS);
     Registration.REQUIREMENTS.register(MOD_BUS);
+    Registration.DATAS.register(MOD_BUS);
 
     RegisterComponentVariantEvent.EVENT.register(Registration::registerComponentVariants);
 

@@ -6,8 +6,7 @@
   "mixins": [
     "CustomCraftRecipeBuilderJS",
     "CustomMachineRecipeBuilderJSMixin",
-    "CustomMachineTileMixin",
-    "RelayTileMixin"
+    "CustomMachineTileMixin"
   ],
   "client": [
     "client.ModelBakeryAccessor"

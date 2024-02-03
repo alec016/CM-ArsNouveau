@@ -2,6 +2,7 @@ package al.alec.custommachineryars;
 
 
 import al.alec.custommachineryars.components.SourceMachineComponent;
+import al.alec.custommachineryars.components.variant.item.SourceItemComponentVariant;
 import al.alec.custommachineryars.guielement.SourceGuiElement;
 import al.alec.custommachineryars.requirement.SourceRequirement;
 import al.alec.custommachineryars.requirement.SourceRequirementPerTick;
@@ -27,6 +28,6 @@ public abstract class Registration {
 
 
   public static void registerComponentVariants(RegisterComponentVariantEvent event) {
-//    event.register(fr.frinn.custommachinery.common.init.Registration.ITEM_MACHINE_COMPONENT.get(), SourceItemComponentVariant.ID, SourceItemComponentVariant.CODEC);
+    event.register(fr.frinn.custommachinery.common.init.Registration.ITEM_MACHINE_COMPONENT.get(), SourceItemComponentVariant.ID, SourceItemComponentVariant.CODEC);
   }
 }

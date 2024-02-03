@@ -14,7 +14,6 @@ import com.hollingsworth.arsnouveau.common.items.DominionWand;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
 import fr.frinn.custommachinery.api.machine.MachineTile;
 import fr.frinn.custommachinery.common.init.CustomMachineTile;
-import fr.frinn.custommachinery.common.util.CMLogger;
 import java.util.List;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;

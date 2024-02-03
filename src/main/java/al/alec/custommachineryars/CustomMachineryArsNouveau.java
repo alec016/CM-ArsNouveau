@@ -9,6 +9,7 @@ import dev.architectury.event.events.common.InteractionEvent;
 import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
+import fr.frinn.custommachinery.api.component.variant.RegisterComponentVariantEvent;
 import fr.frinn.custommachinery.common.init.CustomMachineTile;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,9 +18,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -35,8 +33,9 @@ public class CustomMachineryArsNouveau {
     Registration.MACHINE_COMPONENTS.register(MOD_BUS);
     Registration.REQUIREMENTS.register(MOD_BUS);
 
-    EnvExecutor.runInEnv(Env.CLIENT, () -> ClientHandler::clientInit);
+    RegisterComponentVariantEvent.EVENT.register(Registration::registerComponentVariants);
 
+    EnvExecutor.runInEnv(Env.CLIENT, () -> ClientHandler::clientInit);
 
     InteractionEvent.RIGHT_CLICK_BLOCK.register(CustomMachineryArsNouveau::handleWandClick);
   }
@@ -48,7 +47,6 @@ public class CustomMachineryArsNouveau {
         player.getItemInHand(hand).getItem() instanceof DominionWand wand &&
         player.level.getBlockEntity(pos) instanceof CustomMachineTile tile
     ) {
-//      wand.useOn(new UseOnContext(player, hand, new BlockHitResult(new Vec3(tile.getBlockPos().getX(), tile.getBlockPos().getY(), tile.getBlockPos().getZ()), face, pos, false)));
       ItemStack stack = player.getItemInHand(hand);
       DominionWand.DominionData data = new DominionWand.DominionData(stack);
       if (!data.hasStoredData()) {

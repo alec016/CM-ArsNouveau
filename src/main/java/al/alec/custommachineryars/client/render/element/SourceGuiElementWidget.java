@@ -47,7 +47,7 @@ public class SourceGuiElementWidget extends TexturedGuiElementWidget<SourceGuiEl
     super.renderButton(poseStack, mouseX, mouseY, partialTicks);
     this.getScreen().getTile().getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(source -> {
       double fillPercent = source.getFillPercent();
-      int manaHeight = (int)(fillPercent * (double)(this.height - 2));
+      int manaHeight = (int)(fillPercent * (double)(this.height - 4));
 
       renderSource(poseStack, manaHeight, x + 2, y + 2, width - 4, height - 4);
     });

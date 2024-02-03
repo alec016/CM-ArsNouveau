@@ -14,14 +14,15 @@ public class SourceHelper {
 
   public void fillBufferFromStack(SourceMachineComponent buffer, ItemStack stack) {
     CompoundTag nbt = stack.getOrCreateTag().getCompound("BlockEntityTag").copy();
-    int source = nbt.getInt("source");
+    int itemCount = stack.getCount();
+    int source = nbt.getInt("source") * itemCount;
     int received = buffer.receiveSource(source, true);
     if (received == source){
       nbt.putInt("source", 0);
       buffer.receiveSource(source);
     } else {
       buffer.receiveSource(received);
-      nbt.putInt("source", source - received);
+      nbt.putInt("source", (source - received) / itemCount);
     }
     CompoundTag newNbt = new CompoundTag();
     newNbt.put("BlockEntityTag", nbt);
@@ -32,14 +33,15 @@ public class SourceHelper {
     int stackSource = nbt.getInt("source");
     int stackCapacity = stack.is(BlockRegistry.SOURCE_JAR.asItem()) ? 10000 : 0;
     if (stackSource == stackCapacity || stackCapacity == 0) return;
-    int possibleReceive = stackCapacity - stackSource;
+    int itemCount = stack.getCount();
+    int possibleReceive = (stackCapacity - stackSource) * itemCount;
     int extract;
     if (buffer.extractSource(possibleReceive, true) == possibleReceive) {
-      nbt.putInt("source", stackCapacity);
       buffer.extractSource(possibleReceive);
+      nbt.putInt("source", stackCapacity);
     } else if ((extract = buffer.extractSource(possibleReceive, true)) < possibleReceive) {
       buffer.extractSource(extract);
-      nbt.putInt("source", stackSource + extract);
+      nbt.putInt("source", stackSource + (extract / itemCount));
     }
     CompoundTag newNbt = new CompoundTag();
     newNbt.put("BlockEntityTag", nbt);

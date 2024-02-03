@@ -8,9 +8,7 @@ import net.minecraft.world.item.ItemStack;
 public class SourceHelper {
   public static final SourceHelper INSTANCE = new SourceHelper();
 
-  private SourceHelper() {
-
-  }
+  private SourceHelper() {}
 
   public void fillBufferFromStack(SourceMachineComponent buffer, ItemStack stack) {
     CompoundTag nbt = stack.getOrCreateTag().getCompound("BlockEntityTag").copy();

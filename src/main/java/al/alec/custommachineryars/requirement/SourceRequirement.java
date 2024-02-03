@@ -34,7 +34,6 @@ public class SourceRequirement extends AbstractRequirement<SourceMachineComponen
     this.source = source;
   }
 
-
   @Override
   public List<IJEIIngredientWrapper<Source>> getJEIIngredientWrappers(IMachineRecipe recipe) {
     return Collections.singletonList(new SourceIngredientWrapper(this.getMode(), this.source, false, recipe.getRecipeTime()));

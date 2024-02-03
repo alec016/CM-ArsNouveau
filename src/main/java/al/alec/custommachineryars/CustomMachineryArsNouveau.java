@@ -7,18 +7,14 @@ import com.hollingsworth.arsnouveau.common.items.DominionWand;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
 import dev.architectury.event.EventResult;
 import dev.architectury.event.events.common.InteractionEvent;
-import dev.architectury.event.events.common.LifecycleEvent;
 import dev.architectury.platform.forge.EventBuses;
 import dev.architectury.utils.Env;
 import dev.architectury.utils.EnvExecutor;
 import fr.frinn.custommachinery.api.component.variant.RegisterComponentVariantEvent;
 import fr.frinn.custommachinery.common.init.CustomMachineTile;
-import java.util.Set;
 import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.model.Material;
-import net.minecraft.client.resources.model.ModelBakery;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
@@ -31,17 +27,15 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 
 @Mod(CustomMachineryArsNouveau.MODID)
 public class CustomMachineryArsNouveau {
   public static final String MODID = "custommachineryars";
-  public static final Material source = mainAtlas("block/source_still");
+  public static final Material source = new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation("ars_nouveau", "block/source_still"));
 
   public CustomMachineryArsNouveau() {
     final IEventBus MOD_BUS = FMLJavaModLoadingContext.get().getModEventBus();
@@ -87,11 +81,7 @@ public class CustomMachineryArsNouveau {
     return EventResult.pass();
   }
 
-  private static Material mainAtlas(String name) {
-    return new Material(InventoryMenu.BLOCK_ATLAS, new ResourceLocation(CustomMachineryArsNouveau.MODID, name));
-  }
-
-
+  @SuppressWarnings("unused")
   @Mod.EventBusSubscriber(modid = CustomMachineryArsNouveau.MODID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
   static class ClientSetup {
     @SubscribeEvent

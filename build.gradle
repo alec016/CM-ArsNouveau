@@ -28,6 +28,7 @@ architectury {
 }
 
 repositories {
+    maven { url = "https://maven.parchmentmc.org" } // Parchment mappings
     maven {
         name = "Custom Machinery maven"
         url = "https://maven.frinn.fr/repository/maven/"
@@ -84,7 +85,6 @@ dependencies {
     // Official mappings
     mappings(
         loom.layered {
-            it.mappings("org.quiltmc:quilt-mappings:${project.minecraft_version}+build.${project.qm_version}:intermediary-v2")
             it.parchment("org.parchmentmc.data:parchment-${project.minecraft_version}:${project.parchment_version}@zip")
             it.officialMojangMappings { nameSyntheticMembers = false }
         }
@@ -100,13 +100,11 @@ dependencies {
 
     // JEI 10
     modCompileOnly("mezz.jei:jei-${project.minecraft_version}-common-api:${project.jei_version}")
-    modCompileOnly("mezz.jei:jei-${project.minecraft_version}-forge-api:${project.jei_version}")
+    modCompileOnly("mezz.jei:jei-${project.minecraft_version}-forge-api:${project.jei_version}") {transitive = false}
     modImplementation("mezz.jei:jei-${project.minecraft_version}-forge:${project.jei_version}") {transitive = false}
 
     // Custom Machinery
-    modApi "frinn.custommachinery:CustomMachinery-api:${project.minecraft_version}-${project.custommachinery_version}"
-    modApi "frinn.custommachinery:CustomMachinery-common:${project.minecraft_version}-${project.custommachinery_version}"
-    modLocalRuntime "frinn.custommachinery:CustomMachinery-forge:${project.minecraft_version}-${project.custommachinery_version}"
+    modImplementation "frinn.custommachinery:CustomMachinery-forge:${project.minecraft_version}-${project.custommachinery_version}"
 
     //KubeJS
     modLocalRuntime modCompileOnly("dev.latvian.mods:kubejs-forge:${project.kubejs_version}")

@@ -1,12 +1,10 @@
 package al.alec.custommachineryars.components.variant.item;
 
 import al.alec.custommachineryars.Registration;
-import al.alec.custommachineryars.components.SourceMachineComponent;
 import al.alec.custommachineryars.util.SourceHelper;
 import fr.frinn.custommachinery.CustomMachinery;
 import fr.frinn.custommachinery.api.codec.NamedCodec;
 import fr.frinn.custommachinery.api.component.IMachineComponentManager;
-import fr.frinn.custommachinery.api.component.variant.IComponentVariant;
 import fr.frinn.custommachinery.api.component.variant.ITickableComponentVariant;
 import fr.frinn.custommachinery.common.component.ItemMachineComponent;
 import fr.frinn.custommachinery.impl.component.variant.ItemComponentVariant;
@@ -21,7 +19,12 @@ public class SourceItemComponentVariant extends ItemComponentVariant implements 
   public static final ResourceLocation ID = new ResourceLocation(CustomMachinery.MODID, "source");
   @Override
   public boolean canAccept(IMachineComponentManager manager, ItemStack stack) {
-    CompoundTag nbt = stack.serializeNBT();
+    if (stack.isEmpty() || manager.getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).isEmpty()) return false;
+
+    CompoundTag tag = stack.getTag();
+    if (tag == null || !tag.contains("BlockEntityTag")) return false;
+
+    CompoundTag nbt = tag.getCompound("BlockEntityTag");
     return nbt.contains("source");
   }
 
@@ -38,15 +41,16 @@ public class SourceItemComponentVariant extends ItemComponentVariant implements 
   @Override
   public void tick(@NotNull ItemMachineComponent slot) {
     ItemStack stack = slot.getItemStack();
-    CompoundTag nbt = stack.serializeNBT();
-    if (stack.isEmpty() || !nbt.contains("source") || slot.getManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).isEmpty())
-      return;
+    if (!canAccept(slot.getManager(), stack)) return;
 
-    SourceMachineComponent buffer = slot.getManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).get();
+    CompoundTag nbt = stack.getOrCreateTag().getCompound("BlockEntityTag");
+    if (!nbt.contains("source")) return;
 
-    if (slot.getMode().isInput())
-      SourceHelper.INSTANCE.fillBufferFromStack(buffer, stack);
-    else if (slot.getMode().isOutput())
-      SourceHelper.INSTANCE.fillStackFromBuffer(stack, buffer);
+    slot.getManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(buffer -> {
+      if (slot.getMode().isInput())
+        SourceHelper.INSTANCE.fillBufferFromStack(buffer, stack);
+      else if (slot.getMode().isOutput())
+        SourceHelper.INSTANCE.fillStackFromBuffer(stack, buffer);
+    });
   }
 }

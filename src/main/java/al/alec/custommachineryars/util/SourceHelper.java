@@ -1,6 +1,7 @@
 package al.alec.custommachineryars.util;
 
 import al.alec.custommachineryars.components.SourceMachineComponent;
+import com.hollingsworth.arsnouveau.setup.BlockRegistry;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.ItemStack;
 
@@ -12,7 +13,7 @@ public class SourceHelper {
   }
 
   public void fillBufferFromStack(SourceMachineComponent buffer, ItemStack stack) {
-    CompoundTag nbt = stack.serializeNBT().copy();
+    CompoundTag nbt = stack.getOrCreateTag().getCompound("BlockEntityTag").copy();
     int source = nbt.getInt("source");
     int received = buffer.receiveSource(source, true);
     if (received == source){
@@ -22,15 +23,17 @@ public class SourceHelper {
       buffer.receiveSource(received);
       nbt.putInt("source", source - received);
     }
-    stack.deserializeNBT(nbt);
+    CompoundTag newNbt = new CompoundTag();
+    newNbt.put("BlockEntityTag", nbt);
+    stack.setTag(newNbt);
   }
   public void fillStackFromBuffer(ItemStack stack, SourceMachineComponent buffer) {
-    CompoundTag nbt = stack.serializeNBT().copy();
+    CompoundTag nbt = stack.getOrCreateTag().getCompound("BlockEntityTag").copy();
     int stackSource = nbt.getInt("source");
-    int stackCapacity = nbt.getInt("max_source");
-    if (stackSource == stackCapacity) return;
+    int stackCapacity = stack.is(BlockRegistry.SOURCE_JAR.asItem()) ? 10000 : 0;
+    if (stackSource == stackCapacity || stackCapacity == 0) return;
     int possibleReceive = stackCapacity - stackSource;
-    int extract = 0;
+    int extract;
     if (buffer.extractSource(possibleReceive, true) == possibleReceive) {
       nbt.putInt("source", stackCapacity);
       buffer.extractSource(possibleReceive);
@@ -38,6 +41,8 @@ public class SourceHelper {
       buffer.extractSource(extract);
       nbt.putInt("source", stackSource + extract);
     }
-    stack.deserializeNBT(nbt);
+    CompoundTag newNbt = new CompoundTag();
+    newNbt.put("BlockEntityTag", nbt);
+    stack.setTag(newNbt);
   }
 }

@@ -161,6 +161,14 @@ jar {
     }
 }
 
+remapJar {
+    targetNamespace = 'named'
+}
+
+remapSourcesJar {
+    targetNamespace = 'named'
+}
+
 unifiedPublishing {
     project {
         displayName = "Custom-Machinery-ArsNouveau-${project.minecraft_version}-${project.mod_version}"

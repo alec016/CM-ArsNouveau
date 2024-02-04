@@ -97,11 +97,13 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   @Override
   public void cma$setFromPos(BlockPos pos) {
     this.cma$fromPos = pos;
+    getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
   }
 
   @Override
   public void cma$setToPos(BlockPos pos) {
     this.cma$toPos = pos;
+    getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
   }
 
   @Override

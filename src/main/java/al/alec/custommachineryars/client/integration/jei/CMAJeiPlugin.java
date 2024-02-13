@@ -8,14 +8,16 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IModIngredientRegistration;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 
+@SuppressWarnings("unused")
 @JeiPlugin
 public class CMAJeiPlugin implements IModPlugin {
 
   public static final ResourceLocation PLUGIN_ID = new ResourceLocation(CustomMachineryArsNouveau.MODID, "jei_plugin");
 
   @Override
-  public ResourceLocation getPluginUid() {
+  public @NotNull ResourceLocation getPluginUid() {
     return PLUGIN_ID;
   }
 

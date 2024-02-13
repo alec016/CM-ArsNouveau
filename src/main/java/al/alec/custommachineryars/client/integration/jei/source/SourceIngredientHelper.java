@@ -7,36 +7,37 @@ import mezz.jei.api.ingredients.IIngredientType;
 import mezz.jei.api.ingredients.subtypes.UidContext;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SourceIngredientHelper implements IIngredientHelper<Source> {
   @Override
-  public IIngredientType<Source> getIngredientType() {
+  public @NotNull IIngredientType<Source> getIngredientType() {
     return CustomIngredientTypes.SOURCE;
   }
 
   @Override
-  public String getDisplayName(Source source) {
-    return Component.translatable("custommachinerybotania.jei.ingredient.mana", source.getAmount()).getString();
+  public @NotNull String getDisplayName(Source source) {
+    return Component.translatable("custommachineryars.jei.ingredient.source", source.getAmount()).getString();
   }
 
   @Override
-  public String getUniqueId(Source mana, UidContext context) {
+  public @NotNull String getUniqueId(Source mana, @NotNull UidContext context) {
     return "" + mana.getAmount() + mana.isPerTick();
   }
 
   @Override
-  public Source copyIngredient(Source energy) {
+  public @NotNull Source copyIngredient(Source energy) {
     return new Source(energy.getAmount(), energy.isPerTick());
   }
 
   @Override
-  public String getErrorInfo(@Nullable Source energy) {
+  public @NotNull String getErrorInfo(@Nullable Source energy) {
     return "";
   }
 
   @Override
-  public ResourceLocation getResourceLocation(Source ingredient) {
+  public @NotNull ResourceLocation getResourceLocation(@NotNull Source ingredient) {
     return new ResourceLocation(CustomMachinery.MODID, "source");
   }
 }

@@ -16,6 +16,7 @@ import com.hollingsworth.arsnouveau.common.util.PortUtil;
 import fr.frinn.custommachinery.api.machine.MachineTile;
 import fr.frinn.custommachinery.common.init.CustomMachineTile;
 import java.util.List;
+import java.util.Objects;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -31,7 +32,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@SuppressWarnings("deprecation")
+@SuppressWarnings("deprecation, unused")
 @Mixin({ CustomMachineTile.class })
 public abstract class CustomMachineTileMixin extends MachineTile implements IWandable, ITooltipProvider, IWandableMachineTile {
   @Unique
@@ -40,9 +41,9 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   private BlockPos cma$fromPos;
 
   @Unique
-  String TO = "to_";
+  private static final String cma$TO = "to_";
   @Unique
-  String FROM = "from";
+  private static final String cma$FROM = "from";
 
   public CustomMachineTileMixin(BlockEntityType<?> type, BlockPos pos, BlockState state) {
     super(type, pos, state);
@@ -51,15 +52,15 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   @Inject(method = "saveAdditional", at = @At("TAIL"))
   private void cma$saveAdditional(CompoundTag nbt, CallbackInfo ci) {
     if (cma$toPos != null) {
-      NBTUtil.storeBlockPos(nbt, TO, cma$toPos.immutable());
+      NBTUtil.storeBlockPos(nbt, cma$TO, cma$toPos.immutable());
     } else {
-      NBTUtil.removeBlockPos(nbt, TO);
+      NBTUtil.removeBlockPos(nbt, cma$TO);
     }
 
     if (cma$fromPos != null) {
-      NBTUtil.storeBlockPos(nbt, FROM, cma$fromPos.immutable());
+      NBTUtil.storeBlockPos(nbt, cma$FROM, cma$fromPos.immutable());
     } else {
-      NBTUtil.removeBlockPos(nbt, FROM);
+      NBTUtil.removeBlockPos(nbt, cma$FROM);
     }
   }
 
@@ -68,19 +69,19 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
     this.cma$toPos = null;
     this.cma$fromPos = null;
 
-    if (NBTUtil.hasBlockPos(nbt, TO)) {
-      this.cma$toPos = NBTUtil.getBlockPos(nbt, TO);
+    if (NBTUtil.hasBlockPos(nbt, cma$TO)) {
+      this.cma$toPos = NBTUtil.getBlockPos(nbt, cma$TO);
     }
-    if (NBTUtil.hasBlockPos(nbt, FROM)) {
-      this.cma$fromPos = NBTUtil.getBlockPos(nbt, FROM);
+    if (NBTUtil.hasBlockPos(nbt, cma$FROM)) {
+      this.cma$fromPos = NBTUtil.getBlockPos(nbt, cma$FROM);
     }
   }
 
   @Inject(method = "getUpdateTag", at = @At("RETURN"), cancellable = true)
   private void cma$getUpdateTag(CallbackInfoReturnable<CompoundTag> cir) {
     CompoundTag nbt = cir.getReturnValue();
-    NBTUtil.storeBlockPos(nbt, TO, cma$toPos);
-    NBTUtil.storeBlockPos(nbt, FROM, cma$fromPos);
+    NBTUtil.storeBlockPos(nbt, cma$TO, cma$toPos);
+    NBTUtil.storeBlockPos(nbt, cma$FROM, cma$fromPos);
     cir.setReturnValue(nbt);
   }
 
@@ -97,13 +98,13 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   @Override
   public void cma$setFromPos(BlockPos pos) {
     this.cma$fromPos = pos;
-    getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+    Objects.requireNonNull(getLevel()).sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
   }
 
   @Override
   public void cma$setToPos(BlockPos pos) {
     this.cma$toPos = pos;
-    getLevel().sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
+    Objects.requireNonNull(getLevel()).sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
   }
 
   @Override
@@ -119,7 +120,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
       return;
     }
     // Let relays take from us, no action needed.
-    if (this.setSendTo(storedPos.immutable())) {
+    if (this.cma$setSendTo(storedPos.immutable())) {
       PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.send", DominionWand.getPosString(storedPos)));
       ParticleUtil.beam(storedPos, worldPosition, level);
     } else {
@@ -140,7 +141,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
       return;
     }
 
-    if (this.setTakeFrom(storedPos.immutable())) {
+    if (this.cma$setTakeFrom(storedPos.immutable())) {
       PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.take", DominionWand.getPosString(storedPos)));
     } else {
       PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.fail"));
@@ -149,7 +150,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
 
   @Override
   public void onWanded(Player playerEntity) {
-    this.clearPos();
+    this.cma$clearPos();
     PortUtil.sendMessage(playerEntity, Component.translatable("ars_nouveau.connections.cleared"));
   }
 
@@ -165,14 +166,14 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   }
 
   @Unique
-  public int getMaxDistance() {
+  public int cma$getMaxDistance() {
     return 30;
   }
 
   @Unique
-  public boolean setTakeFrom(BlockPos pos) {
+  public boolean cma$setTakeFrom(BlockPos pos) {
     if (
-      BlockUtil.distanceFrom(pos, this.worldPosition) > getMaxDistance()
+      BlockUtil.distanceFrom(pos, this.worldPosition) > cma$getMaxDistance()
         || pos.equals(getBlockPos())
     ) {
       return false;
@@ -182,11 +183,11 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   }
 
   @Unique
-  public boolean setSendTo(BlockPos pos) {
+  public boolean cma$setSendTo(BlockPos pos) {
     if (
-      BlockUtil.distanceFrom(pos, this.worldPosition) > getMaxDistance()
+      BlockUtil.distanceFrom(pos, this.worldPosition) > cma$getMaxDistance()
       || pos.equals(getBlockPos())
-      || (!(level.getBlockEntity(pos) instanceof AbstractSourceMachine)
+      || (!(Objects.requireNonNull(level).getBlockEntity(pos) instanceof AbstractSourceMachine)
       && !(level.getBlockEntity(pos) instanceof CustomMachineTile))
     ) {
       return false;
@@ -196,7 +197,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   }
 
   @Unique
-  public void clearPos() {
+  public void cma$clearPos() {
     cma$setToPos(null);
     cma$setFromPos(null);
   }

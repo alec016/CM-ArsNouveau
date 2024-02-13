@@ -4,6 +4,9 @@ plugins {
     id "me.shedaniel.unified-publishing" version "0.1.+"
 }
 
+apply plugin: "java"
+apply plugin: "maven-publish"
+
 sourceCompatibility = targetCompatibility = JavaVersion.VERSION_17
 
 archivesBaseName = project.archives_base_name
@@ -11,9 +14,12 @@ version = project.mod_version
 group = project.maven_group
 
 loom {
+    accessWidenerPath = file("src/main/resources/custommachineryars.accesswidener")
     silentMojangMappingsLicense()
     forge {
         mixinConfig "custommachineryars.mixins.json"
+        convertAccessWideners = true
+        extraAccessWideners.add loom.accessWidenerPath.get().asFile.name
     }
 }
 
@@ -90,7 +96,7 @@ dependencies {
     // ars
     modLocalRuntime "vazkii.patchouli:Patchouli:${minecraft_version}-77"
     modLocalRuntime "top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0"
-    modImplementation("com.hollingsworth.ars_nouveau:ars_nouveau-${project.minecraft_version}:${project.ars_version}") {transitive = false}
+    modImplementation("com.hollingsworth.ars_nouveau:ars_nouveau-${project.minecraft_version}:${project.ars_version}.680") {transitive = false}
 
     // JEI 10
     modCompileOnly("mezz.jei:jei-${project.minecraft_version}-common-api:${project.jei_version}")
@@ -126,7 +132,8 @@ processResources {
                 "minecraft_version": project.minecraft_version,
                 "architectury_version": project.architectury_version,
                 "custommachinery_version": project.custommachinery_version,
-                "ars_version": project.ars_version
+                "ars_version": project.ars_version,
+                "forge_version": project.forge_version
     }
 }
 

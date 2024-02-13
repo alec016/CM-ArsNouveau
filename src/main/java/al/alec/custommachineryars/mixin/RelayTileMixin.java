@@ -23,12 +23,16 @@ public abstract class RelayTileMixin extends AbstractSourceMachine {
 
   @Inject(method = "onFinishedConnectionFirst", at = @At(value = "RETURN", ordinal = 0), cancellable = true)
   public void onFinishedConnectionFirst(@Nullable BlockPos storedPos, @Nullable LivingEntity storedEntity, Player playerEntity, CallbackInfo ci) {
+    assert level != null;
+    assert storedPos != null;
     if (!(level.getBlockEntity(storedPos) instanceof CustomMachineTile))
       ci.cancel();
   }
 
   @Inject(method = "onFinishedConnectionLast", at = @At(value = "RETURN", ordinal = 0), cancellable = true)
   private void cma$onFinishedConnectionLast(@Nullable BlockPos storedPos, @Nullable LivingEntity storedEntity, Player playerEntity, CallbackInfo ci) {
+    assert level != null;
+    assert storedPos != null;
     if (!(level.getBlockEntity(storedPos) instanceof CustomMachineTile))
       ci.cancel();
   }

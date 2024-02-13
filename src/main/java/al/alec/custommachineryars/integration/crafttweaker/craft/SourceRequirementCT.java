@@ -7,6 +7,7 @@ import fr.frinn.custommachinery.common.integration.crafttweaker.CTConstants;
 import fr.frinn.custommachinery.common.integration.crafttweaker.CustomCraftRecipeCTBuilder;
 import org.openzen.zencode.java.ZenCodeType;
 
+@SuppressWarnings("unused")
 @ZenRegister
 @ZenCodeType.Expansion(CTConstants.RECIPE_BUILDER_CRAFT)
 public class SourceRequirementCT {

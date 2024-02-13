@@ -4,6 +4,7 @@ import al.alec.custommachineryars.requirement.SourceRequirement;
 import fr.frinn.custommachinery.api.integration.kubejs.RecipeJSBuilder;
 import fr.frinn.custommachinery.api.requirement.RequirementIOMode;
 
+@SuppressWarnings("unused")
 public interface SourceRequirementJS extends RecipeJSBuilder {
 
   default RecipeJSBuilder requireSource(int source) {

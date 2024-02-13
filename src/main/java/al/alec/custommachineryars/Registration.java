@@ -16,6 +16,7 @@ import fr.frinn.custommachinery.api.requirement.RequirementType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.RegistryObject;
 
+@SuppressWarnings("unused")
 public abstract class Registration {
   public static final Registries REGISTRIES = Registries.get(CustomMachineryArsNouveau.MODID);
   public static final DeferredRegister<GuiElementType<?>> GUI_ELEMENTS = DeferredRegister.create(GuiElementType.REGISTRY_KEY, ICustomMachineryAPI.INSTANCE.modid());

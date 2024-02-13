@@ -1,8 +1,8 @@
 package al.alec.custommachineryars.client.render.element;
 
-import al.alec.custommachineryars.CustomMachineryArsNouveau;
 import al.alec.custommachineryars.Registration;
 import al.alec.custommachineryars.client.ClientHandler;
+import al.alec.custommachineryars.client.handler.MiscModels;
 import al.alec.custommachineryars.guielement.SourceGuiElement;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
@@ -33,7 +33,7 @@ public class SourceGuiElementWidget extends TexturedGuiElementWidget<SourceGuiEl
     poseStack.pushPose();
     poseStack.translate(x, y, 0);
 
-    TextureAtlasSprite sprite = CustomMachineryArsNouveau.source.sprite();
+    TextureAtlasSprite sprite = MiscModels.INSTANCE.SOURCE.sprite();
 
     drawTiledSprite(poseStack, width, height, sourceHeight, sprite);
 

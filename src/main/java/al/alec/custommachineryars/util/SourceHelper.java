@@ -26,6 +26,7 @@ public class SourceHelper {
     newNbt.put("BlockEntityTag", nbt);
     stack.setTag(newNbt);
   }
+
   public void fillStackFromBuffer(ItemStack stack, SourceMachineComponent buffer) {
     CompoundTag nbt = stack.getOrCreateTag().getCompound("BlockEntityTag").copy();
     int stackSource = nbt.getInt("source");

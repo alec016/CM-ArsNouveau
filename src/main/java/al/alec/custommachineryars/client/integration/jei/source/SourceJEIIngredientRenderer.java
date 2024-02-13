@@ -11,6 +11,7 @@ import java.util.List;
 import mezz.jei.api.ingredients.IIngredientType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.TooltipFlag;
+import org.jetbrains.annotations.NotNull;
 
 public class SourceJEIIngredientRenderer extends JEIIngredientRenderer<Source, SourceGuiElement> {
 
@@ -34,7 +35,7 @@ public class SourceJEIIngredientRenderer extends JEIIngredientRenderer<Source, S
   }
 
   @Override
-  public void render(PoseStack stack, Source ingredient) {
+  public void render(@NotNull PoseStack stack, @NotNull Source ingredient) {
     int width = this.element.getWidth() - 4;
     int height = this.element.getHeight() - 2;
 
@@ -42,7 +43,7 @@ public class SourceJEIIngredientRenderer extends JEIIngredientRenderer<Source, S
   }
 
   @Override
-  public List<Component> getTooltip(Source ingredient, TooltipFlag tooltipFlag) {
+  public @NotNull List<Component> getTooltip(Source ingredient, @NotNull TooltipFlag tooltipFlag) {
     List<Component> tooltips = new ArrayList<>();
     String amount = Utils.format(ingredient.getAmount());
     if(ingredient.isPerTick())

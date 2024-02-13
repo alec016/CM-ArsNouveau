@@ -3,11 +3,8 @@ package al.alec.custommachineryars.components;
 import al.alec.custommachineryars.Registration;
 import al.alec.custommachineryars.client.integration.jei.source.Source;
 import al.alec.custommachineryars.util.IWandableMachineTile;
-import com.hollingsworth.arsnouveau.api.item.IWandable;
 import com.hollingsworth.arsnouveau.api.source.AbstractSourceMachine;
 import com.hollingsworth.arsnouveau.api.source.ISourceTile;
-import com.hollingsworth.arsnouveau.api.source.ISpecialSourceProvider;
-import com.hollingsworth.arsnouveau.api.source.SourceManager;
 import com.hollingsworth.arsnouveau.client.particle.ParticleUtil;
 import fr.frinn.custommachinery.api.codec.NamedCodec;
 import fr.frinn.custommachinery.api.component.ComponentIOMode;
@@ -31,6 +28,7 @@ import java.util.function.Consumer;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 
+@SuppressWarnings("unused")
 public class SourceMachineComponent implements IMachineComponent, ITickableComponent, ISerializableComponent, IComparatorInputComponent, IDumpComponent, ISyncableStuff, ISourceTile {
   private int source;
   private final int capacity, maxIn, maxOut;
@@ -223,7 +221,7 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
     }
 
     if (wandableMachine.cma$getToPos() != null && manager.getLevel().isLoaded(wandableMachine.cma$getToPos())) {
-      if (!(manager.getLevel().getBlockEntity(wandableMachine.cma$getToPos()) instanceof AbstractSourceMachine)) {
+      if (!(manager.getLevel().getBlockEntity(wandableMachine.cma$getToPos()) instanceof AbstractSourceMachine toTile)) {
         if ((manager.getLevel().getBlockEntity(wandableMachine.cma$getToPos()) instanceof CustomMachineTile tile)) {
           if (tile.getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).isEmpty()) {
             wandableMachine.cma$setToPos(null);
@@ -239,7 +237,6 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
         manager.markDirty();
         return;
       }
-      AbstractSourceMachine toTile = (AbstractSourceMachine) manager.getLevel().getBlockEntity(wandableMachine.cma$getToPos());
       if (wandableMachine.cma$transferSource(this, toTile) > 0) {
         ParticleUtil.spawnFollowProjectile(manager.getLevel(), manager.getTile().getBlockPos(), wandableMachine.cma$getToPos());
       }

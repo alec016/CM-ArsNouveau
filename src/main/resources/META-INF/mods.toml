@@ -5,7 +5,7 @@ issueTrackerURL = "https://github.com/alec016/CM-ArsNouveau/issues"
 [[mods]] #mandatory
 # The modid of the mod
 modId = "custommachineryars" #mandatory
-version = "${mod_version}" #mandatory
+version = "1.0.1" #mandatory
 # A display name for the mod
 displayName = "Custom Machinery ArsNouveau" #mandatory
 logoFile = "icon.png" #optional
@@ -13,31 +13,31 @@ description = '''
 ${mod_description}
 '''
 [[dependencies.custommachineryars]]
-    modId = "forge"
-    mandatory = true
-    versionRange = "[${forge_version},)"
-    ordering = "AFTER"
+modId = "forge"
+mandatory = true
+versionRange = "[${forge_version},)"
+ordering = "AFTER"
 
 [[dependencies.custommachineryars]]
-    modId = "minecraft"
-    mandatory = true
-    versionRange = "[1.19.2,1.20)"
-    ordering = "AFTER"
+modId = "minecraft"
+mandatory = true
+versionRange = "[1.19.2,1.20)"
+ordering = "AFTER"
 
 [[dependencies.custommachineryars]]
-    modId = "architectury"
-    mandatory = true
-    versionRange = "[${architectury_version},)"
-    ordering = "AFTER"
+modId = "architectury"
+mandatory = true
+versionRange = "[${architectury_version},)"
+ordering = "AFTER"
 
 [[dependencies.custommachineryars]]
-    modId = "custommachinery"
-    mandatory = true
-    versionRange = "[${custommachinery_version},)"
-    ordering = "AFTER"
+modId = "custommachinery"
+mandatory = true
+versionRange = "[${custommachinery_version},)"
+ordering = "AFTER"
 
 [[dependencies.custommachineryars]]
-    modId = "ars_nouveau"
-    mandatory = true
-    versionRange = "[${ars_version},)"
-    ordering = "AFTER"
+modId = "ars_nouveau"
+mandatory = true
+versionRange = "[${ars_version},)"
+ordering = "AFTER"

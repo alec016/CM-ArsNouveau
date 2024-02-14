@@ -29,7 +29,7 @@ public class SourceIngredientWrapper implements IJEIIngredientWrapper<Source> {
     if(!(element instanceof SourceGuiElement manaElement) || element.getType() != Registration.SOURCE_GUI_ELEMENT.get())
       return false;
 
-    builder.addSlot(roleFromMode(this.mode), element.getX() - xOffset + 2, element.getY() - yOffset)
+    builder.addSlot(roleFromMode(this.mode), element.getX() - xOffset + 2, element.getY() - yOffset + 2)
       .setCustomRenderer(CustomIngredientTypes.SOURCE, new SourceJEIIngredientRenderer(manaElement))
       .addIngredient(CustomIngredientTypes.SOURCE, this.source)
       .addTooltipCallback((recipeSlotView, tooltip) -> {

@@ -31,13 +31,13 @@ public class SourceJEIIngredientRenderer extends JEIIngredientRenderer<Source, S
 
   @Override
   public int getHeight() {
-    return this.element.getHeight() - 2;
+    return this.element.getHeight() - 4;
   }
 
   @Override
   public void render(@NotNull PoseStack stack, @NotNull Source ingredient) {
     int width = this.element.getWidth() - 4;
-    int height = this.element.getHeight() - 2;
+    int height = this.element.getHeight() - 4;
 
     SourceGuiElementWidget.renderSource(stack, height, 0, 0, width, height);
   }

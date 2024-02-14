@@ -3,6 +3,7 @@
   "minVersion": "0.8",
   "package": "al.alec.custommachineryars.mixin",
   "compatibilityLevel": "JAVA_17",
+  "refmap": "custommachineryars.refmap.json",
   "mixins": [
     "CustomCraftRecipeBuilderJS",
     "CustomMachineRecipeBuilderJSMixin",

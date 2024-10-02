@@ -1,0 +1,18 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "es.degrassi.custommachineryars.mixin",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "custommachineryars.refmap.json",
+  "mixins": [
+    "CustomCraftRecipeBuilderJS",
+    "CustomMachineRecipeBuilderJSMixin",
+    "CustomMachineTileMixin",
+    "RelayTileMixin"
+  ],
+  "client": [
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}

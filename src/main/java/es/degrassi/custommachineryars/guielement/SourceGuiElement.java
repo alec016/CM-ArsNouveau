@@ -13,7 +13,7 @@ import fr.frinn.custommachinery.impl.guielement.AbstractTexturedGuiElement;
 import net.minecraft.resources.ResourceLocation;
 
 public class SourceGuiElement extends AbstractTexturedGuiElement implements IComponentGuiElement<SourceMachineComponent> {
-  private static final ResourceLocation BASE_SOURCE_STORAGE_EMPTY_TEXTURE = new ResourceLocation(CustommachineryArs.MODID, "textures/gui/base_source_storage_empty.png");
+  private static final ResourceLocation BASE_SOURCE_STORAGE_EMPTY_TEXTURE = ResourceLocation.fromNamespaceAndPath(CustommachineryArs.MODID, "textures/gui/base_source_storage_empty.png");
 
   public static final NamedCodec<SourceGuiElement> CODEC = NamedCodec.record(manaGuiElement ->
       manaGuiElement.group(

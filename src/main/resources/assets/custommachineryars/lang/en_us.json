@@ -21,5 +21,6 @@
   "custommachineryars.gui.creation.components.source.title": "Source Component",
 
   "custommachinery.machine.component.source": "Source",
-  "custommachinery.machine.guielement.source": "Bar"
+  "custommachinery.machine.guielement.source": "Source",
+  "custommachinery.machine.component.item_source": "Item (source handler)"
 }

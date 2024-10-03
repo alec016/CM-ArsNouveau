@@ -1,6 +1,9 @@
 package es.degrassi.custommachineryars.mixin;
 
 import com.hollingsworth.arsnouveau.client.particle.ColorPos;
+import com.hollingsworth.arsnouveau.common.items.data.DominionWandData;
+import com.hollingsworth.arsnouveau.setup.registry.DataComponentRegistry;
+import es.degrassi.custommachineryars.Registration;
 import es.degrassi.custommachineryars.util.IWandableMachineTile;
 import com.hollingsworth.arsnouveau.api.client.ITooltipProvider;
 import com.hollingsworth.arsnouveau.api.item.IWandable;
@@ -10,7 +13,6 @@ import com.hollingsworth.arsnouveau.api.util.BlockUtil;
 import com.hollingsworth.arsnouveau.api.util.NBTUtil;
 import com.hollingsworth.arsnouveau.client.particle.ParticleColor;
 import com.hollingsworth.arsnouveau.client.particle.ParticleUtil;
-//import com.hollingsworth.arsnouveau.client..util.ColorPos;
 import com.hollingsworth.arsnouveau.common.block.tile.RelayTile;
 import com.hollingsworth.arsnouveau.common.items.DominionWand;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
@@ -20,6 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.LivingEntity;
@@ -36,6 +39,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 @SuppressWarnings("deprecation, unused")
 @Mixin({ CustomMachineTile.class })
 public abstract class CustomMachineTileMixin extends MachineTile implements IWandable, ITooltipProvider, IWandableMachineTile {
+
   @Unique
   private BlockPos cma$toPos;
   @Unique
@@ -51,7 +55,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   }
 
   @Inject(method = "saveAdditional", at = @At("TAIL"))
-  private void cma$saveAdditional(CompoundTag nbt, CallbackInfo ci) {
+  private void cma$saveAdditional(CompoundTag nbt, HolderLookup.Provider registries, CallbackInfo ci) {
     if (cma$toPos != null) {
       NBTUtil.storeBlockPos(nbt, cma$TO, cma$toPos.immutable());
     } else {
@@ -65,8 +69,8 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
     }
   }
 
-  @Inject(method = "load", at = @At("TAIL"))
-  private void cma$load(CompoundTag nbt, CallbackInfo ci) {
+  @Inject(method = "loadAdditional", at = @At("TAIL"))
+  private void cma$loadAdditional(CompoundTag nbt, HolderLookup.Provider registries, CallbackInfo ci) {
     this.cma$toPos = null;
     this.cma$fromPos = null;
 
@@ -208,7 +212,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
     int transferRate = cma$getTransferRate(from, to);
     from.removeSource(transferRate);
     to.addSource(transferRate);
-    getComponentManager().markDirty();
+    this.getComponentManager().markDirty();
     return transferRate;
   }
 
@@ -222,6 +226,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
 
   @Override
   public void getTooltip(List<Component> tooltip) {
+    if (!getComponentManager().hasComponent(Registration.SOURCE_MACHINE_COMPONENT.get())) return;
     tooltip.clear();
     if (cma$toPos == null) {
       tooltip.add(Component.translatable("custommachineryars.relay.no_to"));

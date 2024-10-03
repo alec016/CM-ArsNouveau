@@ -2,13 +2,13 @@ package es.degrassi.custommachineryars.client.render.element;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.BufferUploader;
 import com.mojang.blaze3d.vertex.DefaultVertexFormat;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.blaze3d.vertex.VertexFormat;
 import es.degrassi.custommachineryars.Registration;
 import es.degrassi.custommachineryars.client.ClientHandler;
-import es.degrassi.custommachineryars.client.handler.MiscModels;
 import es.degrassi.custommachineryars.guielement.SourceGuiElement;
 import fr.frinn.custommachinery.api.guielement.IMachineScreen;
 import fr.frinn.custommachinery.common.util.Utils;
@@ -41,7 +41,7 @@ public class SourceGuiElementWidget extends TexturedGuiElementWidget<SourceGuiEl
       Minecraft
         .getInstance()
         .getTextureAtlas(InventoryMenu.BLOCK_ATLAS)
-        .apply(new ResourceLocation("ars_nouveau", "block/source_still"))
+        .apply(ResourceLocation.fromNamespaceAndPath("ars_nouveau", "block/source_still"))
     );
 
     drawTiledSprite(poseStack, width, height, sourceHeight, sprite);
@@ -125,12 +125,11 @@ public class SourceGuiElementWidget extends TexturedGuiElementWidget<SourceGuiEl
     float zLevel = 100;
 
     Tesselator tesselator = Tesselator.getInstance();
-    BufferBuilder bufferBuilder = tesselator.getBuilder();
-    bufferBuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-    bufferBuilder.vertex(matrix, xCoord, yCoord + 16, zLevel).uv(uMin, vMax).endVertex();
-    bufferBuilder.vertex(matrix, xCoord + 16 - maskRight, yCoord + 16, zLevel).uv(uMax, vMax).endVertex();
-    bufferBuilder.vertex(matrix, xCoord + 16 - maskRight, yCoord + maskTop, zLevel).uv(uMax, vMin).endVertex();
-    bufferBuilder.vertex(matrix, xCoord, yCoord + maskTop,zLevel).uv(uMin, vMin).endVertex();
-    tesselator.end();
+    BufferBuilder bufferBuilder = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+    bufferBuilder.addVertex(matrix, xCoord, yCoord + 16, zLevel).setUv(uMin, vMax);
+    bufferBuilder.addVertex(matrix, xCoord + 16 - maskRight, yCoord + 16, zLevel).setUv(uMax, vMax);
+    bufferBuilder.addVertex(matrix, xCoord + 16 - maskRight, yCoord + maskTop, zLevel).setUv(uMax, vMin);
+    bufferBuilder.addVertex(matrix, xCoord, yCoord + maskTop,zLevel).setUv(uMin, vMin);
+    BufferUploader.drawWithShader(bufferBuilder.buildOrThrow());
   }
 }

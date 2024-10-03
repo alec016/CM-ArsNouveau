@@ -21,8 +21,15 @@ public class SourceIngredientHelper implements IIngredientHelper<Source> {
     return Component.translatable("custommachineryars.jei.ingredient.source", source.getAmount()).getString();
   }
 
+  //Safe to remove
+  @SuppressWarnings("removal")
   @Override
   public @NotNull String getUniqueId(Source mana, @NotNull UidContext context) {
+    return "" + mana.getAmount() + mana.isPerTick();
+  }
+
+  @Override
+  public @NotNull String getUid(Source mana, @NotNull UidContext context) {
     return "" + mana.getAmount() + mana.isPerTick();
   }
 
@@ -38,6 +45,6 @@ public class SourceIngredientHelper implements IIngredientHelper<Source> {
 
   @Override
   public @NotNull ResourceLocation getResourceLocation(@NotNull Source ingredient) {
-    return new ResourceLocation(CustomMachinery.MODID, "source");
+    return ResourceLocation.fromNamespaceAndPath(CustomMachinery.MODID, "source");
   }
 }

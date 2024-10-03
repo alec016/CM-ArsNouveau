@@ -1,8 +1,10 @@
 package es.degrassi.custommachineryars.client.integration.jei;
 
+import es.degrassi.custommachineryars.client.integration.jei.source.Source;
 import es.degrassi.custommachineryars.client.integration.jei.source.SourceIngredientHelper;
 import es.degrassi.custommachineryars.CustommachineryArs;
 import fr.frinn.custommachinery.client.integration.jei.DummyIngredientRenderer;
+import java.util.ArrayList;
 import java.util.Collections;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -14,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 @JeiPlugin
 public class CMAJeiPlugin implements IModPlugin {
 
-  public static final ResourceLocation PLUGIN_ID = new ResourceLocation(CustommachineryArs.MODID, "jei_plugin");
+  public static final ResourceLocation PLUGIN_ID = ResourceLocation.fromNamespaceAndPath(CustommachineryArs.MODID, "jei_plugin");
 
   @Override
   public @NotNull ResourceLocation getPluginUid() {
@@ -23,6 +25,6 @@ public class CMAJeiPlugin implements IModPlugin {
 
   @Override
   public void registerIngredients(IModIngredientRegistration registration) {
-    registration.register(CustomIngredientTypes.SOURCE, Collections.emptyList(), new SourceIngredientHelper(), new DummyIngredientRenderer<>());
+    registration.register(CustomIngredientTypes.SOURCE, new ArrayList<>(), new SourceIngredientHelper(), new DummyIngredientRenderer<>(), Source.CODEC);
   }
 }

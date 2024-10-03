@@ -9,18 +9,21 @@ import fr.frinn.custommachinery.api.component.MachineComponentType;
 import fr.frinn.custommachinery.api.crafting.CraftingResult;
 import fr.frinn.custommachinery.api.crafting.ICraftingContext;
 import fr.frinn.custommachinery.api.crafting.IMachineRecipe;
+import fr.frinn.custommachinery.api.crafting.IRequirementList;
 import fr.frinn.custommachinery.api.integration.jei.IJEIIngredientRequirement;
 import fr.frinn.custommachinery.api.integration.jei.IJEIIngredientWrapper;
 import fr.frinn.custommachinery.api.requirement.IRequirement;
-import fr.frinn.custommachinery.api.requirement.ITickableRequirement;
+import fr.frinn.custommachinery.api.requirement.RecipeRequirement;
 import fr.frinn.custommachinery.api.requirement.RequirementIOMode;
 import fr.frinn.custommachinery.api.requirement.RequirementType;
-import fr.frinn.custommachinery.impl.requirement.AbstractRequirement;
 import java.util.Collections;
 import java.util.List;
 import net.minecraft.network.chat.Component;
 
-public class SourceRequirementPerTick extends AbstractRequirement<SourceMachineComponent> implements ITickableRequirement<SourceMachineComponent>, IJEIIngredientRequirement<Source> {
+public record SourceRequirementPerTick(
+  RequirementIOMode mode,
+  int source
+) implements IRequirement<SourceMachineComponent>, IJEIIngredientRequirement<Source> {
   public static final NamedCodec<SourceRequirementPerTick> CODEC = NamedCodec.record(manaRequirementInstance ->
       manaRequirementInstance.group(
         RequirementIOMode.CODEC.fieldOf("mode").forGetter(IRequirement::getMode),
@@ -29,37 +32,49 @@ public class SourceRequirementPerTick extends AbstractRequirement<SourceMachineC
     "Source requirement per tick"
   );
 
-  private final int source;
-  public SourceRequirementPerTick(RequirementIOMode mode, int source) {
-    super(mode);
-    this.source = source;
-  }
   @Override
-  public List<IJEIIngredientWrapper<Source>> getJEIIngredientWrappers(IMachineRecipe recipe) {
+  public RequirementIOMode getMode() {
+    return this.mode;
+  }
+
+  @Override
+  public List<IJEIIngredientWrapper<Source>> getJEIIngredientWrappers(IMachineRecipe recipe, RecipeRequirement<?, ?> requirement) {
     return Collections.singletonList(new SourceIngredientWrapper(this.getMode(), this.source, true, recipe.getRecipeTime()));
   }
 
   @Override
-  public CraftingResult processTick(SourceMachineComponent component, ICraftingContext context) {
-    if (getMode() == RequirementIOMode.OUTPUT) {
-      if ((component.getCapacity() - component.getSource()) < source)
-        return CraftingResult.error(Component.translatable(
-          "custommachineryars.requirements.sourcepertick.error.output",
-          source
-        ));
-      component.receiveSource(source, false);
-      return CraftingResult.success();
-    } else if (getMode() == RequirementIOMode.INPUT) {
-      if (component.getSource() < source)
-        return CraftingResult.error(Component.translatable(
-          "custommachineryars.requirements.sourcepertick.error.input",
-          source,
-          component.getSource()
-        ));
-      component.extractSource(source, false);
+  public void gatherRequirements(IRequirementList<SourceMachineComponent> list) {
+    if(this.mode == RequirementIOMode.INPUT)
+      list.processEachTick(this::processInputs);
+    else
+      list.processEachTick(this::processOutputs);
+  }
+
+  private CraftingResult processInputs(SourceMachineComponent component, ICraftingContext context) {
+    int amount = (int)context.getPerTickIntegerModifiedValue(this.source, this, null);
+    int canExtract = component.extractSource(amount, true);
+    if(canExtract == amount) {
+      component.extractSource(amount, false);
       return CraftingResult.success();
     }
-    return CraftingResult.pass();
+    return CraftingResult.error(Component.translatable(
+      "custommachineryars.requirements.sourcepertick.error.input",
+      source,
+      component.getSource()
+    ));
+  }
+
+  private CraftingResult processOutputs(SourceMachineComponent component, ICraftingContext context) {
+    int amount = (int)context.getPerTickIntegerModifiedValue(this.source, this, null);
+    int canReceive = component.receiveSource(amount, true);
+    if(canReceive == amount) {
+      component.receiveSource(amount, false);
+      return CraftingResult.success();
+    }
+    return CraftingResult.error(Component.translatable(
+      "custommachineryars.requirements.sourcepertick.error.output",
+      source
+    ));
   }
 
   @Override
@@ -78,15 +93,5 @@ public class SourceRequirementPerTick extends AbstractRequirement<SourceMachineC
       case INPUT -> component.getSource() >= source;
       case OUTPUT -> component.getCapacity() - component.getSource() >= source;
     };
-  }
-
-  @Override
-  public CraftingResult processStart(SourceMachineComponent component, ICraftingContext context) {
-    return CraftingResult.pass();
-  }
-
-  @Override
-  public CraftingResult processEnd(SourceMachineComponent component, ICraftingContext context) {
-    return CraftingResult.pass();
   }
 }

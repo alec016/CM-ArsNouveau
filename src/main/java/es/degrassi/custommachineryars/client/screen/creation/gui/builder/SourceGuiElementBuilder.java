@@ -52,7 +52,7 @@ public class SourceGuiElementBuilder implements IGuiElementBuilder<SourceGuiElem
     public void addWidgets(GridLayout.RowHelper row) {
       this.addPriority(row);
       row.addChild(new StringWidget(Component.translatable("custommachinery.gui.creation.gui.highlight"), this.font));
-      this.highlight = row.addChild(new Checkbox(0, 0, 20, 20, Component.translatable("custommachinery.gui.creation.gui.highlight"), this.baseElement == null || this.baseElement.highlight()));
+      this.highlight = row.addChild(Checkbox.builder(Component.translatable("custommachinery.gui.creation.gui.highlight"), this.font).selected(this.baseElement == null || this.baseElement.highlight()).build());
     }
   }
 }

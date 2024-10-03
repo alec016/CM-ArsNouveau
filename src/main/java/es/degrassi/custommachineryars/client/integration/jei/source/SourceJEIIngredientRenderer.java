@@ -7,6 +7,7 @@ import fr.frinn.custommachinery.api.integration.jei.JEIIngredientRenderer;
 import fr.frinn.custommachinery.common.util.Utils;
 import java.util.ArrayList;
 import java.util.List;
+import mezz.jei.api.gui.builder.ITooltipBuilder;
 import mezz.jei.api.ingredients.IIngredientType;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
@@ -51,5 +52,14 @@ public class SourceJEIIngredientRenderer extends JEIIngredientRenderer<Source, S
     else
       tooltips.add(Component.translatable("custommachineryars.jei.ingredient.source", amount));
     return tooltips;
+  }
+
+  @Override
+  public void getTooltip(ITooltipBuilder tooltip, Source ingredient, TooltipFlag tooltipFlag) {
+    String amount = Utils.format(ingredient.getAmount());
+    if(ingredient.isPerTick())
+      tooltip.add(Component.translatable("custommachineryars.jei.ingredient.source.pertick", amount));
+    else
+      tooltip.add(Component.translatable("custommachineryars.jei.ingredient.source", amount));
   }
 }

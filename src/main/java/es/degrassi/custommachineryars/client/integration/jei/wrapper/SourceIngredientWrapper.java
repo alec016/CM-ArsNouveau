@@ -24,6 +24,7 @@ public class SourceIngredientWrapper implements IJEIIngredientWrapper<Source> {
     this.recipeTime = recipeTime;
     this.source = new Source(amount, isPerTick);
   }
+
   @Override
   public boolean setupRecipe(IRecipeLayoutBuilder builder, int xOffset, int yOffset, IGuiElement element, IRecipeHelper helper) {
     if(!(element instanceof SourceGuiElement manaElement) || element.getType() != Registration.SOURCE_GUI_ELEMENT.get())
@@ -32,7 +33,7 @@ public class SourceIngredientWrapper implements IJEIIngredientWrapper<Source> {
     builder.addSlot(roleFromMode(this.mode), element.getX() - xOffset + 2, element.getY() - yOffset + 2)
       .setCustomRenderer(CustomIngredientTypes.SOURCE, new SourceJEIIngredientRenderer(manaElement))
       .addIngredient(CustomIngredientTypes.SOURCE, this.source)
-      .addTooltipCallback((recipeSlotView, tooltip) -> {
+      .addRichTooltipCallback((recipeSlotView, tooltip) -> {
         Component component;
         String amount = Utils.format(this.source.getAmount());
         if(this.source.isPerTick()) {
@@ -47,7 +48,7 @@ public class SourceIngredientWrapper implements IJEIIngredientWrapper<Source> {
           else
             component = Component.translatable("custommachineryars.jei.ingredient.source.output", amount);
         }
-        tooltip.set(0, component);
+        tooltip.add(component);
       });
     return true;
   }

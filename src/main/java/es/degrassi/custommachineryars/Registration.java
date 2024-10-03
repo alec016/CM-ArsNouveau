@@ -1,35 +1,33 @@
 package es.degrassi.custommachineryars;
 
-
-import dev.architectury.registry.registries.RegistrarManager;
 import es.degrassi.custommachineryars.components.SourceMachineComponent;
-import es.degrassi.custommachineryars.components.variant.item.SourceItemComponentVariant;
+import es.degrassi.custommachineryars.components.item.SourceItemMachineComponent;
 import es.degrassi.custommachineryars.guielement.SourceGuiElement;
 import es.degrassi.custommachineryars.requirement.SourceRequirement;
 import es.degrassi.custommachineryars.requirement.SourceRequirementPerTick;
-import fr.frinn.custommachinery.api.ICustomMachineryAPI;
+import fr.frinn.custommachinery.CustomMachinery;
 import fr.frinn.custommachinery.api.component.MachineComponentType;
-import fr.frinn.custommachinery.api.component.variant.RegisterComponentVariantEvent;
 import fr.frinn.custommachinery.api.guielement.GuiElementType;
+import fr.frinn.custommachinery.api.guielement.IGuiElement;
 import fr.frinn.custommachinery.api.network.DataType;
 import fr.frinn.custommachinery.api.requirement.RequirementType;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import fr.frinn.custommachinery.common.component.handler.ItemComponentHandler;
+import fr.frinn.custommachinery.common.component.item.ItemMachineComponent;
+import java.util.function.Supplier;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 @SuppressWarnings("unused")
 public abstract class Registration {
-  public static final RegistrarManager REGISTRIES = RegistrarManager.get(CustommachineryArs.MODID);
-  public static final DeferredRegister<GuiElementType<?>> GUI_ELEMENTS = DeferredRegister.create(GuiElementType.REGISTRY_KEY, ICustomMachineryAPI.INSTANCE.modid());
-  public static final DeferredRegister<MachineComponentType<?>> MACHINE_COMPONENTS = DeferredRegister.create(MachineComponentType.REGISTRY_KEY, ICustomMachineryAPI.INSTANCE.modid());
-  public static final DeferredRegister<RequirementType<?>> REQUIREMENTS = DeferredRegister.create(RequirementType.REGISTRY_KEY, ICustomMachineryAPI.INSTANCE.modid());
-  public static final DeferredRegister<DataType<?, ?>> DATAS = DeferredRegister.create(DataType.REGISTRY_KEY, ICustomMachineryAPI.INSTANCE.modid());
+  public static final DeferredRegister<GuiElementType<? extends IGuiElement>> GUI_ELEMENTS = DeferredRegister.create(GuiElementType.REGISTRY_KEY, CustomMachinery.MODID);
+  public static final DeferredRegister<MachineComponentType<?>> MACHINE_COMPONENTS = DeferredRegister.create(MachineComponentType.REGISTRY_KEY, CustomMachinery.MODID);
+  public static final DeferredRegister<RequirementType<?>> REQUIREMENTS = DeferredRegister.create(RequirementType.REGISTRY_KEY, CustomMachinery.MODID);
+  public static final DeferredRegister<DataType<?, ?>> DATAS = DeferredRegister.create(DataType.REGISTRY_KEY, CustomMachinery.MODID);
 
-  public static final RegistryObject<GuiElementType<SourceGuiElement>> SOURCE_GUI_ELEMENT = GUI_ELEMENTS.register("source", () -> GuiElementType.create(SourceGuiElement.CODEC));
-  public static final RegistryObject<MachineComponentType<SourceMachineComponent>> SOURCE_MACHINE_COMPONENT = MACHINE_COMPONENTS.register("source", () -> MachineComponentType.create(SourceMachineComponent.Template.CODEC));
-  public static final RegistryObject<RequirementType<SourceRequirement>> SOURCE_REQUIREMENT = REQUIREMENTS.register("source", () -> RequirementType.world(SourceRequirement.CODEC));
-  public static final RegistryObject<RequirementType<SourceRequirementPerTick>> SOURCE_REQUIREMENT_PER_TICK = REQUIREMENTS.register("source_per_tick", () -> RequirementType.world(SourceRequirementPerTick.CODEC));
+  public static final Supplier<GuiElementType<SourceGuiElement>> SOURCE_GUI_ELEMENT = GUI_ELEMENTS.register("source", () -> GuiElementType.create(SourceGuiElement.CODEC));
+  public static final Supplier<MachineComponentType<SourceMachineComponent>> SOURCE_MACHINE_COMPONENT = MACHINE_COMPONENTS.register("source", () -> MachineComponentType.create(SourceMachineComponent.Template.CODEC));
+  public static final Supplier<RequirementType<SourceRequirement>> SOURCE_REQUIREMENT = REQUIREMENTS.register("source", () -> RequirementType.world(SourceRequirement.CODEC));
+  public static final Supplier<RequirementType<SourceRequirementPerTick>> SOURCE_REQUIREMENT_PER_TICK = REQUIREMENTS.register("source_per_tick", () -> RequirementType.world(SourceRequirementPerTick.CODEC));
 
-  public static void registerComponentVariants(RegisterComponentVariantEvent event) {
-    event.register(fr.frinn.custommachinery.common.init.Registration.ITEM_MACHINE_COMPONENT.get(), SourceItemComponentVariant.ID, SourceItemComponentVariant.CODEC);
-  }
+  public static final Supplier<MachineComponentType<ItemMachineComponent>> ITEM_SOURCE_MACHINE_COMPONENT = MACHINE_COMPONENTS.register("item_source", () -> MachineComponentType.create(SourceItemMachineComponent.Template.CODEC).setNotSingle(ItemComponentHandler::new));
+
 }

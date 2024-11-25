@@ -10,6 +10,7 @@ import fr.frinn.custommachinery.api.codec.NamedCodec;
 import fr.frinn.custommachinery.api.component.ComponentIOMode;
 import fr.frinn.custommachinery.api.component.IComparatorInputComponent;
 import fr.frinn.custommachinery.api.component.IDumpComponent;
+import fr.frinn.custommachinery.api.component.IMachineComponent;
 import fr.frinn.custommachinery.api.component.IMachineComponentManager;
 import fr.frinn.custommachinery.api.component.IMachineComponentTemplate;
 import fr.frinn.custommachinery.api.component.ISerializableComponent;
@@ -19,38 +20,51 @@ import fr.frinn.custommachinery.api.network.ISyncable;
 import fr.frinn.custommachinery.api.network.ISyncableStuff;
 import fr.frinn.custommachinery.common.init.CustomMachineTile;
 import fr.frinn.custommachinery.common.network.syncable.IntegerSyncable;
+import fr.frinn.custommachinery.common.network.syncable.StringSyncable;
 import fr.frinn.custommachinery.impl.component.AbstractMachineComponent;
-import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 
+import java.util.List;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.function.Consumer;
+
 @SuppressWarnings("unused")
-public class SourceMachineComponent extends AbstractMachineComponent implements ITickableComponent, ISerializableComponent, IComparatorInputComponent, IDumpComponent, ISyncableStuff, ISourceTile {
+public class SourceMachineComponent implements IMachineComponent, ITickableComponent, ISerializableComponent,
+    IComparatorInputComponent, IDumpComponent, ISyncableStuff, ISourceTile {
   private int source;
   private final int capacity, maxIn, maxOut;
+  private final IMachineComponentManager manager;
+  private ComponentIOMode mode;
 
   public SourceMachineComponent(IMachineComponentManager manager) {
-    this (manager, ComponentIOMode.BOTH, 1, 0, 0);
+    this(manager, ComponentIOMode.BOTH, 1, 0, 0);
   }
 
   public SourceMachineComponent(IMachineComponentManager manager, ComponentIOMode mode, int capacity, int maxIn, int maxOut) {
-    super(manager, mode);
+    this.manager = manager;
+    this.mode = mode;
     this.capacity = capacity;
     this.maxIn = Math.min(maxIn, capacity);
     this.maxOut = Math.min(maxOut, capacity);
   }
 
+  public ComponentIOMode setMode(ComponentIOMode mode) {
+    this.mode = mode;
+    this.getManager().markDirty();
+    return mode;
+  }
+
   @Override
   public int getComparatorInput() {
-    return (int) (15 * ((double)this.source / (double)this.capacity));
+    return (int) (15 * ((double) this.source / (double) this.capacity));
   }
 
   @Override
   public int getTransferRate() {
-    return switch(getMode()) {
+    return switch (getMode()) {
       case INPUT -> maxIn;
       case OUTPUT -> maxOut;
       case BOTH -> Math.min(maxIn, maxOut);
@@ -63,7 +77,12 @@ public class SourceMachineComponent extends AbstractMachineComponent implements 
     return getMode() == ComponentIOMode.INPUT || getMode() == ComponentIOMode.BOTH;
   }
 
-  public int getSource () {
+  @Override
+  public boolean canProvideSource() {
+    return (getMode().isOutput() || getMode() == ComponentIOMode.BOTH) && this.getSource() > 0;
+  }
+
+  public int getSource() {
     return this.source;
   }
 
@@ -77,7 +96,7 @@ public class SourceMachineComponent extends AbstractMachineComponent implements 
 
   }
 
-  public int setSource (int source) {
+  public int setSource(int source) {
     this.source = source;
     getManager().markDirty();
     return source;
@@ -97,7 +116,7 @@ public class SourceMachineComponent extends AbstractMachineComponent implements 
     return receiveSource(receive, false);
   }
 
-  public int receiveSource (int maxReceive, boolean simulate) {
+  public int receiveSource(int maxReceive, boolean simulate) {
     if (this.getMaxInput() <= 0) return 0;
     int manaReceived = Math.min(this.getCapacity() - this.getSource(), Math.min(this.getMaxInput(), maxReceive));
     if (!simulate && manaReceived > 0) {
@@ -108,10 +127,10 @@ public class SourceMachineComponent extends AbstractMachineComponent implements 
   }
 
   public int extractSource(int extract) {
-    return extractSource (extract, false);
+    return extractSource(extract, false);
   }
 
-  public int extractSource (int maxExtract, boolean simulate) {
+  public int extractSource(int maxExtract, boolean simulate) {
     if (this.getMaxOutput() <= 0) return 0;
     int manaExtracted = Math.min(this.getSource(), Math.min(this.getMaxOutput(), maxExtract));
     if (!simulate && manaExtracted > 0) {
@@ -122,22 +141,22 @@ public class SourceMachineComponent extends AbstractMachineComponent implements 
   }
 
   public double getFillPercent() {
-    return (double)this.source / this.capacity;
+    return (double) this.source / this.capacity;
   }
 
   public boolean isFull() {
     return this.capacity == this.source;
   }
 
-  public int getCapacity () {
+  public int getCapacity() {
     return this.capacity;
   }
 
-  public int getMaxInput () {
+  public int getMaxInput() {
     return maxIn;
   }
 
-  public int getMaxOutput () {
+  public int getMaxOutput() {
     return maxOut;
   }
 
@@ -150,12 +169,15 @@ public class SourceMachineComponent extends AbstractMachineComponent implements 
   @Override
   public void serialize(CompoundTag nbt, HolderLookup.Provider registries) {
     nbt.putInt("source", this.source);
+    nbt.putString("mode", this.mode.toString());
   }
 
   @Override
   public void deserialize(CompoundTag nbt, HolderLookup.Provider registries) {
     if (nbt.contains("source", Tag.TAG_INT))
       this.source = Math.min(nbt.getInt("source"), this.capacity);
+    if (nbt.contains("mode", Tag.TAG_STRING))
+      this.mode = ComponentIOMode.value(nbt.getString("mode"));
   }
 
   @Override
@@ -164,14 +186,73 @@ public class SourceMachineComponent extends AbstractMachineComponent implements 
   }
 
   @Override
-  public void getStuffToSync(Consumer<ISyncable<?, ?>> container) {
-    container.accept(IntegerSyncable.create(() -> this.source, mana -> this.source = mana));
+  public ComponentIOMode getMode() {
+    return mode;
   }
 
   @Override
-  public void serverTick () {
-    IWandableMachineTile wandableMachine = (IWandableMachineTile) getManager().getTile();
-    if (wandableMachine.cma$getFromPos() != null && getManager().getLevel().isLoaded(wandableMachine.cma$getFromPos())) {
+  public IMachineComponentManager getManager() {
+    return manager;
+  }
+
+  @Override
+  public void getStuffToSync(Consumer<ISyncable<?, ?>> container) {
+    container.accept(IntegerSyncable.create(() -> this.source, mana -> this.source = mana));
+    container.accept(StringSyncable.create(() -> this.getMode().toString().toLowerCase(Locale.ENGLISH), modeS -> this.mode = ComponentIOMode.value(modeS)));
+  }
+
+  @Override
+  public void serverTick() {
+    IWandableMachineTile wandableMachine = (IWandableMachineTile) manager.getTile();
+    if (wandableMachine.cma$getFromPos() != null && manager.getLevel().isLoaded(wandableMachine.cma$getFromPos())) {
+      // Block has been removed
+      if (!(manager.getLevel().getBlockEntity(wandableMachine.cma$getFromPos()) instanceof AbstractSourceMachine)) {
+        if ((manager.getLevel().getBlockEntity(wandableMachine.cma$getFromPos()) instanceof CustomMachineTile tile)) {
+          if (tile.getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).isEmpty()) {
+            wandableMachine.cma$setFromPos(null);
+          } else {
+            if (wandableMachine.cma$transferSource(tile.getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).get(), this) > 0) {
+              ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getFromPos(), manager.getTile().getBlockPos());
+            }
+          }
+          manager.markDirty();
+          return;
+        }
+        wandableMachine.cma$setFromPos(null);
+        manager.markDirty();
+      } else if (manager.getLevel().getBlockEntity(wandableMachine.cma$getFromPos()) instanceof AbstractSourceMachine fromTile) {
+        // Transfer mana fromPos to this
+        if (wandableMachine.cma$transferSource(fromTile, this) > 0) {
+          manager.markDirty();
+          ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getFromPos(), manager.getTile().getBlockPos());
+        }
+      }
+    }
+
+    if (wandableMachine.cma$getToPos() != null && manager.getLevel().isLoaded(wandableMachine.cma$getToPos())) {
+      if (!(manager.getLevel().getBlockEntity(wandableMachine.cma$getToPos()) instanceof AbstractSourceMachine toTile)) {
+        if ((manager.getLevel().getBlockEntity(wandableMachine.cma$getToPos()) instanceof CustomMachineTile tile)) {
+          if (tile.getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).isEmpty()) {
+            wandableMachine.cma$setToPos(null);
+          } else {
+            if (wandableMachine.cma$transferSource(tile.getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).get(), this) > 0) {
+              ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getToPos(), manager.getTile().getBlockPos());
+            }
+          }
+          manager.markDirty();
+          return;
+        }
+        wandableMachine.cma$setToPos(null);
+        manager.markDirty();
+        return;
+      }
+      if (wandableMachine.cma$transferSource(this, toTile) > 0) {
+        ParticleUtil.spawnFollowProjectile(manager.getLevel(), manager.getTile().getBlockPos(), wandableMachine.cma$getToPos());
+      }
+    }
+    /*if (wandableMachine.cma$getFromPos() != null && getManager().getLevel().isLoaded(wandableMachine.cma$getFromPos
+    ())) {
+
       // Block has been removed
       if (!(getManager().getLevel().getBlockEntity(wandableMachine.cma$getFromPos()) instanceof AbstractSourceMachine)) {
         if ((getManager().getLevel().getBlockEntity(wandableMachine.cma$getFromPos()) instanceof CustomMachineTile tile)) {
@@ -223,22 +304,23 @@ public class SourceMachineComponent extends AbstractMachineComponent implements 
       if (wandableMachine.cma$transferSource(this, toTile) > 0) {
         ParticleUtil.spawnFollowProjectile(getManager().getLevel(), getManager().getTile().getBlockPos(), wandableMachine.cma$getToPos());
       }
-    }
+    }*/
   }
 
   public record Template(
-    ComponentIOMode mode,
-    int capacity,
-    int maxInput,
-    int maxOutput
+      ComponentIOMode mode,
+      int capacity,
+      int maxInput,
+      int maxOutput
   ) implements IMachineComponentTemplate<SourceMachineComponent> {
     public static final NamedCodec<Template> CODEC = NamedCodec.record(templateInstance ->
-      templateInstance.group(
-        NamedCodec.enumCodec(ComponentIOMode.class).optionalFieldOf("mode", ComponentIOMode.BOTH).forGetter(template -> template.mode),
-        NamedCodec.intRange(1, Integer.MAX_VALUE).fieldOf("capacity").forGetter(template -> template.capacity),
-        NamedCodec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("maxInput").forGetter(template -> Optional.of(template.maxInput)),
-        NamedCodec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("maxOutput").forGetter(template -> Optional.of(template.maxOutput))
-      ).apply(templateInstance, (mode, capacity, maxIn, maxOut) -> new Template(mode, capacity, maxIn.orElse(capacity), maxOut.orElse(capacity))), "Mana machine component"
+        templateInstance.group(
+            NamedCodec.enumCodec(ComponentIOMode.class).optionalFieldOf("mode", ComponentIOMode.BOTH).forGetter(template -> template.mode),
+            NamedCodec.intRange(1, Integer.MAX_VALUE).fieldOf("capacity").forGetter(template -> template.capacity),
+            NamedCodec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("maxInput").forGetter(template -> Optional.of(template.maxInput)),
+            NamedCodec.intRange(0, Integer.MAX_VALUE).optionalFieldOf("maxOutput").forGetter(template -> Optional.of(template.maxOutput))
+        ).apply(templateInstance, (mode, capacity, maxIn, maxOut) -> new Template(mode, capacity,
+            maxIn.orElse(capacity), maxOut.orElse(capacity))), "Source machine component"
     );
 
     @Override

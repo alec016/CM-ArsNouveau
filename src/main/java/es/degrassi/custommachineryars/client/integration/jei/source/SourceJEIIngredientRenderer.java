@@ -44,6 +44,7 @@ public class SourceJEIIngredientRenderer extends JEIIngredientRenderer<Source, S
   }
 
   @Override
+  @SuppressWarnings("removal")
   public @NotNull List<Component> getTooltip(Source ingredient, @NotNull TooltipFlag tooltipFlag) {
     List<Component> tooltips = new ArrayList<>();
     String amount = Utils.format(ingredient.getAmount());

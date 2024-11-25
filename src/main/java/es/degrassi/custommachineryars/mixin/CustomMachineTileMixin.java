@@ -1,26 +1,21 @@
 package es.degrassi.custommachineryars.mixin;
 
-import com.hollingsworth.arsnouveau.client.particle.ColorPos;
-import com.hollingsworth.arsnouveau.common.items.data.DominionWandData;
-import com.hollingsworth.arsnouveau.setup.registry.DataComponentRegistry;
-import es.degrassi.custommachineryars.Registration;
-import es.degrassi.custommachineryars.util.IWandableMachineTile;
 import com.hollingsworth.arsnouveau.api.client.ITooltipProvider;
 import com.hollingsworth.arsnouveau.api.item.IWandable;
 import com.hollingsworth.arsnouveau.api.source.AbstractSourceMachine;
 import com.hollingsworth.arsnouveau.api.source.ISourceTile;
 import com.hollingsworth.arsnouveau.api.util.BlockUtil;
 import com.hollingsworth.arsnouveau.api.util.NBTUtil;
+import com.hollingsworth.arsnouveau.client.particle.ColorPos;
 import com.hollingsworth.arsnouveau.client.particle.ParticleColor;
 import com.hollingsworth.arsnouveau.client.particle.ParticleUtil;
 import com.hollingsworth.arsnouveau.common.block.tile.RelayTile;
 import com.hollingsworth.arsnouveau.common.items.DominionWand;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
+import es.degrassi.custommachineryars.Registration;
+import es.degrassi.custommachineryars.util.IWandableMachineTile;
 import fr.frinn.custommachinery.api.machine.MachineTile;
 import fr.frinn.custommachinery.common.init.CustomMachineTile;
-import java.util.List;
-import java.util.Objects;
-import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -35,6 +30,10 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+
+import javax.annotation.Nullable;
+import java.util.List;
+import java.util.Objects;
 
 @SuppressWarnings("deprecation, unused")
 @Mixin({ CustomMachineTile.class })
@@ -210,6 +209,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   @Override
   public int cma$transferSource(ISourceTile from, ISourceTile to) {
     int transferRate = cma$getTransferRate(from, to);
+    if (transferRate <= 0) return 0;
     from.removeSource(transferRate);
     to.addSource(transferRate);
     this.getComponentManager().markDirty();
@@ -226,8 +226,8 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
 
   @Override
   public void getTooltip(List<Component> tooltip) {
-    if (!getComponentManager().hasComponent(Registration.SOURCE_MACHINE_COMPONENT.get())) return;
     tooltip.clear();
+    if (!getComponentManager().hasComponent(Registration.SOURCE_MACHINE_COMPONENT.get())) return;
     if (cma$toPos == null) {
       tooltip.add(Component.translatable("custommachineryars.relay.no_to"));
     } else {

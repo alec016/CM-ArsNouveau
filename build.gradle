@@ -171,24 +171,22 @@ dependencies {
   implementation ("io.github.llamalad7:mixinextras-neoforge:0.4.1")
   // ars
   localRuntime ("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
-  localRuntime ("vazkii.patchouli:Patchouli:${project.minecraft_version}-${project.patchouli_version}")
+  localRuntime ("vazkii.patchouli:Patchouli:1.21-${project.patchouli_version}")
   localRuntime "top.theillusivec4.curios:curios-neoforge:${project.curios_version}"
-  localRuntime compileOnly ("com.hollingsworth.ars_nouveau:ars_nouveau-${project.minecraft_version}.0:${project.ars_version}.729") // TODO: fix minecraft version
+  localRuntime compileOnly ("com.hollingsworth.ars_nouveau:ars_nouveau-${project.minecraft_version}:${project.ars_version}.765")
 
   // JEI 10
-  compileOnly ("mezz.jei:jei-${project.minecraft_version}.1-common-api:${project.jei_version}")
-  compileOnly ("mezz.jei:jei-${project.minecraft_version}.1-neoforge-api:${project.jei_version}")
-  localRuntime ("mezz.jei:jei-${project.minecraft_version}.1-neoforge:${project.jei_version}")
+  compileOnly ("mezz.jei:jei-${project.minecraft_version}-neoforge-api:${project.jei_version}")
+  localRuntime ("mezz.jei:jei-${project.minecraft_version}-neoforge:${project.jei_version}")
 
   // Custom Machinery
-  localRuntime ("me.shedaniel.cloth:cloth-config-neoforge:${project.cloth_config_version}")
-  localRuntime compileOnly ("frinn.custommachinery:CustomMachinery-neoforge:${project.minecraft_version}.1-${project.custommachinery_version}") // TODO: fix minecraft version
+  localRuntime compileOnly ("frinn.custommachinery:CustomMachinery-neoforge:${project.minecraft_version}-${project.custommachinery_version}")
 
   //KubeJS
   localRuntime compileOnly ("dev.latvian.mods:kubejs-neoforge:${project.kubejs_version}")
 
   //Crafttweaker
-  localRuntime compileOnly ("com.blamejared.crafttweaker:CraftTweaker-neoforge-${project.minecraft_version}.1:${project.ct_version}")
+  localRuntime compileOnly ("com.blamejared.crafttweaker:CraftTweaker-neoforge-${project.minecraft_version}:${project.ct_version}")
 
   // Jade
   localRuntime compileOnly("curse.maven:jade-324717:${jade_version}")
@@ -244,7 +242,7 @@ unifiedPublishing {
     gameLoaders = ["neoforge"]
     mainPublication jar
 
-    var CURSE_API_KEY = System.getenv("CURSEFORGE_KEY")
+    var CURSE_API_KEY = System.getenv("CURSEFORGE")
     if (CURSE_API_KEY != null) {
       curseforge {
         token = CURSE_API_KEY

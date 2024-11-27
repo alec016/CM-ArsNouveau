@@ -4,7 +4,7 @@
   "package": "es.degrassi.custommachineryars.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "CustomCraftRecipeBuilderJS",
+    "CustomCraftRecipeBuilderJSMixin",
     "CustomMachineRecipeBuilderJSMixin",
     "CustomMachineTileMixin",
     "RelayTileMixin"

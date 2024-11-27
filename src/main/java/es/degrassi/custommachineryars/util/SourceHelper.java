@@ -15,18 +15,16 @@ public class SourceHelper {
 
     BlockFillContents tag = stack.getComponents().get(DataComponentRegistry.BLOCK_FILL_CONTENTS.get());
     int itemCount = stack.getCount();
-    assert tag != null;
+    if (tag == null) return;
     int source = tag.amount() * itemCount;
     int received = buffer.receiveSource(source, true);
     BlockFillContents newContent;
     if (received == source){
       newContent = new BlockFillContents(0);
-//      tag.putInt("source", 0);
       buffer.receiveSource(source);
     } else {
       buffer.receiveSource(received);
       newContent = new BlockFillContents((source - received) / itemCount);
-//      nbt.putInt("source", (source - received) / itemCount);
     }
     stack.set(DataComponentRegistry.BLOCK_FILL_CONTENTS.get(), newContent);
   }
@@ -34,7 +32,7 @@ public class SourceHelper {
   public void fillStackFromBuffer(ItemStack stack, SourceMachineComponent buffer) {
 
     BlockFillContents nbt = stack.getComponents().get(DataComponentRegistry.BLOCK_FILL_CONTENTS.get());
-//    CompoundTag nbt = stack.getComponents().getOrDefault(DataComponents.BLOCK_ENTITY_DATA, CustomData.of(new CompoundTag())).copyTag();
+    if (nbt == null) return;
     int stackSource = nbt.amount();
     int stackCapacity = stack.is(BlockRegistry.SOURCE_JAR.asItem()) ? 10000 : 0;
     if (stackSource == stackCapacity || stackCapacity == 0) return;
@@ -45,11 +43,9 @@ public class SourceHelper {
     if (buffer.extractSource(possibleReceive, true) == possibleReceive) {
       buffer.extractSource(possibleReceive);
       newContent = new BlockFillContents(stackCapacity);
-//      nbt.putInt("source", stackCapacity);
     } else if ((extract = buffer.extractSource(possibleReceive, true)) < possibleReceive) {
       buffer.extractSource(extract);
       newContent = new BlockFillContents(stackSource + (extract / itemCount));
-//      nbt.putInt("source", stackSource + (extract / itemCount));
     } else {
       newContent = nbt;
     }

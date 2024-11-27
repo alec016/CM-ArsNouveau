@@ -52,9 +52,9 @@ public record SourceRequirementPerTick(
 
   private CraftingResult processInputs(SourceMachineComponent component, ICraftingContext context) {
     int amount = (int)context.getPerTickIntegerModifiedValue(this.source, this, null);
-    int canExtract = component.extractSource(amount, true);
+    int canExtract = component.extractSourceRecipe(amount, true);
     if(canExtract == amount) {
-      component.extractSource(amount, false);
+      component.extractSourceRecipe(amount, false);
       return CraftingResult.success();
     }
     return CraftingResult.error(Component.translatable(
@@ -66,9 +66,9 @@ public record SourceRequirementPerTick(
 
   private CraftingResult processOutputs(SourceMachineComponent component, ICraftingContext context) {
     int amount = (int)context.getPerTickIntegerModifiedValue(this.source, this, null);
-    int canReceive = component.receiveSource(amount, true);
+    int canReceive = component.receiveSourceRecipe(amount, true);
     if(canReceive == amount) {
-      component.receiveSource(amount, false);
+      component.receiveSourceRecipe(amount, false);
       return CraftingResult.success();
     }
     return CraftingResult.error(Component.translatable(

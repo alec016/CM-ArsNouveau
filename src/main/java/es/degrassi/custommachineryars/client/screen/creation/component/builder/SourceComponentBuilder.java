@@ -4,20 +4,19 @@ import com.hollingsworth.arsnouveau.setup.registry.BlockRegistry;
 import es.degrassi.custommachineryars.Registration;
 import es.degrassi.custommachineryars.components.SourceMachineComponent;
 import es.degrassi.custommachineryars.components.SourceMachineComponent.Template;
-import fr.frinn.custommachinery.api.component.ComponentIOMode;
 import fr.frinn.custommachinery.api.component.MachineComponentType;
 import fr.frinn.custommachinery.client.screen.BaseScreen;
 import fr.frinn.custommachinery.client.screen.creation.MachineEditScreen;
 import fr.frinn.custommachinery.client.screen.creation.component.ComponentBuilderPopup;
 import fr.frinn.custommachinery.client.screen.creation.component.IMachineComponentBuilder;
 import fr.frinn.custommachinery.client.screen.popup.PopupScreen;
-import java.util.function.Consumer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.CycleButton;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.function.Consumer;
 
 public class SourceComponentBuilder implements IMachineComponentBuilder<SourceMachineComponent, Template> {
   @Override
@@ -40,7 +39,6 @@ public class SourceComponentBuilder implements IMachineComponentBuilder<SourceMa
     private EditBox capacity;
     private EditBox maxInput;
     private EditBox maxOutput;
-    private CycleButton<ComponentIOMode> mode;
 
     public SourceComponentBuilderPopup(BaseScreen parent, Template template, Consumer<Template> onFinish) {
       super(parent, template, onFinish, Component.translatable("custommachineryars.gui.creation.components.source.title"));
@@ -48,7 +46,7 @@ public class SourceComponentBuilder implements IMachineComponentBuilder<SourceMa
 
     @Override
     public Template makeTemplate() {
-      return new Template(mode.getValue(), (int) parseLong(capacity.getValue()), (int) parseLong(maxInput.getValue()), (int) parseLong(maxOutput.getValue()));
+      return new Template((int) parseLong(capacity.getValue()), (int) parseLong(maxInput.getValue()), (int) parseLong(maxOutput.getValue()));
     }
 
     @Override
@@ -59,10 +57,6 @@ public class SourceComponentBuilder implements IMachineComponentBuilder<SourceMa
       this.capacity = this.propertyList.add(Component.translatable("custommachinery.gui.creation.components.capacity"), new EditBox(this.font, 0, 0, 160, 20, Component.translatable("custommachinery.gui.creation.components.capacity")));
       this.capacity.setFilter(this::checkLong);
       this.baseTemplate().ifPresentOrElse(template -> this.capacity.setValue("" + template.capacity()), () -> this.capacity.setValue("10000"));
-
-      //mode
-      this.mode = this.propertyList.add(Component.translatable("custommachinery.gui.creation.components.mode"), CycleButton.builder(ComponentIOMode::toComponent).displayOnlyValue().withValues(ComponentIOMode.values()).withInitialValue(ComponentIOMode.BOTH).create(0, 0, 180, 20, Component.translatable("custommachinery.gui.creation.components.mode")));
-      this.baseTemplate().ifPresent(template -> this.mode.setValue(template.mode()));
 
       //Max input
       this.maxInput = this.propertyList.add(Component.translatable("custommachinery.gui.creation.components.maxInput"), new EditBox(this.font, 0, 0, 180, 20, Component.translatable("custommachinery.gui.creation.components.maxInput")));

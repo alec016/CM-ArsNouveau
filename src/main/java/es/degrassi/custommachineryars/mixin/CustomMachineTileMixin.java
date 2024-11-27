@@ -14,6 +14,7 @@ import com.hollingsworth.arsnouveau.common.items.DominionWand;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
 import es.degrassi.custommachineryars.Registration;
 import es.degrassi.custommachineryars.util.IWandableMachineTile;
+import fr.frinn.custommachinery.api.component.IMachineComponentManager;
 import fr.frinn.custommachinery.api.machine.MachineTile;
 import fr.frinn.custommachinery.common.init.CustomMachineTile;
 import net.minecraft.core.BlockPos;
@@ -25,6 +26,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -36,8 +38,11 @@ import java.util.List;
 import java.util.Objects;
 
 @SuppressWarnings("deprecation, unused")
-@Mixin({ CustomMachineTile.class })
+@Mixin({CustomMachineTile.class})
 public abstract class CustomMachineTileMixin extends MachineTile implements IWandable, ITooltipProvider, IWandableMachineTile {
+
+  @Shadow
+  public abstract IMachineComponentManager getComponentManager();
 
   @Unique
   private BlockPos cma$toPos;
@@ -114,42 +119,48 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   @Override
   public void onFinishedConnectionFirst(@Nullable BlockPos storedPos, @Nullable LivingEntity storedEntity, Player playerEntity) {
     if (
-      level == null
-        || storedPos == null
-        || level.isClientSide
-        || storedPos.equals(getBlockPos())
-        || (!(level.getBlockEntity(storedPos) instanceof AbstractSourceMachine)
-        && !(level.getBlockEntity(storedPos) instanceof CustomMachineTile))
+        level == null
+            || storedPos == null
+            || level.isClientSide
+            || storedPos.equals(getBlockPos())
+            || (!(level.getBlockEntity(storedPos) instanceof AbstractSourceMachine)
+            && !(level.getBlockEntity(storedPos) instanceof CustomMachineTile))
     ) {
       return;
     }
-    // Let relays take from us, no action needed.
-    if (this.cma$setSendTo(storedPos.immutable())) {
-      PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.send", DominionWand.getPosString(storedPos)));
-      ParticleUtil.beam(storedPos, worldPosition, level);
-    } else {
-      PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.fail"));
-    }
+
+    getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(component -> {
+      // Let relays take from us, no action needed.
+      if (this.cma$setSendTo(storedPos.immutable())) {
+        PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.send", DominionWand.getPosString(storedPos)));
+        ParticleUtil.beam(storedPos, worldPosition, level);
+      } else {
+        PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.fail"));
+      }
+
+    });
   }
 
   @Override
   public void onFinishedConnectionLast(@Nullable BlockPos storedPos, @Nullable LivingEntity storedEntity, Player playerEntity) {
     if (
-      level == null
-        || storedPos == null
-        || storedPos.equals(getBlockPos())
-        || level.getBlockEntity(storedPos) instanceof RelayTile
-        || (!(level.getBlockEntity(storedPos) instanceof AbstractSourceMachine)
-        && !(level.getBlockEntity(storedPos) instanceof CustomMachineTile))
+        level == null
+            || storedPos == null
+            || storedPos.equals(getBlockPos())
+            || level.getBlockEntity(storedPos) instanceof RelayTile
+            || (!(level.getBlockEntity(storedPos) instanceof AbstractSourceMachine)
+            && !(level.getBlockEntity(storedPos) instanceof CustomMachineTile))
     ) {
       return;
     }
 
-    if (this.cma$setTakeFrom(storedPos.immutable())) {
-      PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.take", DominionWand.getPosString(storedPos)));
-    } else {
-      PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.fail"));
-    }
+    getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(component -> {
+      if (this.cma$setTakeFrom(storedPos.immutable())) {
+        PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.take", DominionWand.getPosString(storedPos)));
+      } else {
+        PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.fail"));
+      }
+    });
   }
 
   @Override
@@ -163,7 +174,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
     if (cma$toPos != null) {
       list.add(ColorPos.centered(cma$toPos, ParticleColor.TO_HIGHLIGHT));
     }
-    if(cma$fromPos != null){
+    if (cma$fromPos != null) {
       list.add(ColorPos.centered(cma$fromPos, ParticleColor.FROM_HIGHLIGHT));
     }
     return list;
@@ -177,8 +188,8 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   @Unique
   public boolean cma$setTakeFrom(BlockPos pos) {
     if (
-      BlockUtil.distanceFrom(pos, this.worldPosition) > cma$getMaxDistance()
-        || pos.equals(getBlockPos())
+        BlockUtil.distanceFrom(pos, this.worldPosition) > cma$getMaxDistance()
+            || pos.equals(getBlockPos())
     ) {
       return false;
     }
@@ -189,10 +200,10 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   @Unique
   public boolean cma$setSendTo(BlockPos pos) {
     if (
-      BlockUtil.distanceFrom(pos, this.worldPosition) > cma$getMaxDistance()
-      || pos.equals(getBlockPos())
-      || (!(Objects.requireNonNull(level).getBlockEntity(pos) instanceof AbstractSourceMachine)
-      && !(level.getBlockEntity(pos) instanceof CustomMachineTile))
+        BlockUtil.distanceFrom(pos, this.worldPosition) > cma$getMaxDistance()
+            || pos.equals(getBlockPos())
+            || (!(Objects.requireNonNull(level).getBlockEntity(pos) instanceof AbstractSourceMachine)
+            && !(level.getBlockEntity(pos) instanceof CustomMachineTile))
     ) {
       return false;
     }
@@ -227,16 +238,17 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   @Override
   public void getTooltip(List<Component> tooltip) {
     tooltip.clear();
-    if (!getComponentManager().hasComponent(Registration.SOURCE_MACHINE_COMPONENT.get())) return;
-    if (cma$toPos == null) {
-      tooltip.add(Component.translatable("custommachineryars.relay.no_to"));
-    } else {
-      tooltip.add(Component.translatable("custommachineryars.relay.one_to", 1));
-    }
-    if (cma$fromPos == null) {
-      tooltip.add(Component.translatable("custommachineryars.relay.no_from"));
-    } else {
-      tooltip.add(Component.translatable("custommachineryars.relay.one_from", 1));
-    }
+    getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(component -> {
+      if (cma$toPos == null) {
+        tooltip.add(Component.translatable("custommachineryars.relay.no_to"));
+      } else {
+        tooltip.add(Component.translatable("custommachineryars.relay.one_to", 1));
+      }
+      if (cma$fromPos == null) {
+        tooltip.add(Component.translatable("custommachineryars.relay.no_from"));
+      } else {
+        tooltip.add(Component.translatable("custommachineryars.relay.one_from", 1));
+      }
+    });
   }
 }

@@ -10,13 +10,16 @@ import fr.frinn.custommachinery.api.component.ITickableComponent;
 import fr.frinn.custommachinery.api.component.MachineComponentType;
 import fr.frinn.custommachinery.api.utils.Filter;
 import fr.frinn.custommachinery.common.component.item.ItemMachineComponent;
-import fr.frinn.custommachinery.impl.component.config.SideConfig;
-import java.util.Optional;
+import fr.frinn.custommachinery.impl.component.config.IOSideConfig;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.Optional;
+
 public class SourceItemMachineComponent extends ItemMachineComponent implements ITickableComponent {
-  public SourceItemMachineComponent(IMachineComponentManager manager, ComponentIOMode mode, String id, int capacity, int maxInput, int maxOutput, Filter<Item> filter, SideConfig.Template configTemplate, boolean locked) {
+  public SourceItemMachineComponent(IMachineComponentManager manager, ComponentIOMode mode, String id, int capacity,
+                                    int maxInput, int maxOutput, Filter<Item> filter,
+                                    IOSideConfig.Template configTemplate, boolean locked) {
     super(manager, mode, id, capacity, maxInput, maxOutput, filter, configTemplate, locked);
   }
 
@@ -49,7 +52,7 @@ public class SourceItemMachineComponent extends ItemMachineComponent implements 
   public static class Template extends ItemMachineComponent.Template {
     public static final NamedCodec<Template> CODEC = defaultCodec(Template::new, "Source item machine component");
 
-    public Template(String id, ComponentIOMode mode, int capacity, Optional<Integer> maxInput, Optional<Integer> maxOutput, Filter<Item> filter, Optional<SideConfig.Template> config, boolean locked) {
+    public Template(String id, ComponentIOMode mode, int capacity, Optional<Integer> maxInput, Optional<Integer> maxOutput, Filter<Item> filter, Optional<IOSideConfig.Template> config, boolean locked) {
       super(id, mode, capacity, maxInput, maxOutput, filter, config, locked);
     }
 

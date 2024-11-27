@@ -1,5 +1,6 @@
 package es.degrassi.custommachineryars.integration.kubejs;
 
+import dev.latvian.mods.rhino.util.HideFromJS;
 import es.degrassi.custommachineryars.requirement.SourceRequirement;
 import fr.frinn.custommachinery.api.integration.kubejs.RecipeJSBuilder;
 import fr.frinn.custommachinery.api.requirement.RequirementIOMode;
@@ -15,6 +16,7 @@ public interface SourceRequirementJS extends RecipeJSBuilder {
     return addSourceRequirement(RequirementIOMode.OUTPUT, source);
   }
 
+  @HideFromJS
   default RecipeJSBuilder addSourceRequirement(RequirementIOMode mode, int source) {
     if (source < 0)
       return error("Source value cannot be negative");

@@ -1,5 +1,6 @@
 package es.degrassi.custommachineryars.integration.kubejs;
 
+import dev.latvian.mods.rhino.util.HideFromJS;
 import es.degrassi.custommachineryars.requirement.SourceRequirementPerTick;
 import fr.frinn.custommachinery.api.integration.kubejs.RecipeJSBuilder;
 import fr.frinn.custommachinery.api.requirement.RequirementIOMode;
@@ -15,6 +16,7 @@ public interface SourceRequirementPerTickJS extends RecipeJSBuilder {
     return addSourcePerTickRequirement(RequirementIOMode.OUTPUT, source);
   }
 
+  @HideFromJS
   default RecipeJSBuilder addSourcePerTickRequirement(RequirementIOMode mode, int source) {
     if (source < 0)
       return error("Source value cannot be negative");

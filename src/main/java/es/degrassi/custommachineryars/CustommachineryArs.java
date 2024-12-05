@@ -6,6 +6,7 @@ import com.hollingsworth.arsnouveau.common.items.data.DominionWandData;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
 import com.hollingsworth.arsnouveau.setup.registry.DataComponentRegistry;
 import fr.frinn.custommachinery.common.init.CustomMachineTile;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
@@ -44,7 +45,7 @@ public class CustommachineryArs {
         ItemStack stack = player.getItemInHand(event.getHand());
         DominionWandData data = stack.getOrDefault(DataComponentRegistry.DOMINION_WAND.get(), new DominionWandData());
         if (!data.hasStoredData()) {
-          data = data.storePos(event.getPos().immutable());
+          data = data.storePos(new GlobalPos(event.getLevel().dimension(), event.getPos().immutable()));
           if (data.strict()) data = data.setFace(event.getFace());
           stack.set(DataComponentRegistry.DOMINION_WAND.get(), data);
           PortUtil.sendMessage(player, Component.translatable("ars_nouveau.dominion_wand.position_set"));
@@ -52,7 +53,7 @@ public class CustommachineryArs {
           event.setCanceled(true);
           return;
         }
-        if (data.storedPos().isPresent() && player.getCommandSenderWorld().getBlockEntity(data.storedPos().get()) instanceof IWandable wandable) {
+        if (data.storedPos().isPresent() && player.getCommandSenderWorld().getBlockEntity(data.storedPos().get().pos()) instanceof IWandable wandable) {
           wandable.onFinishedConnectionFirst(data.storedPos().get(), (LivingEntity) player.level().getEntity(data.storedEntityId()), player);
         }
         if (tile instanceof IWandable wandable) {

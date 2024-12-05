@@ -173,7 +173,7 @@ dependencies {
   localRuntime ("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
   localRuntime ("vazkii.patchouli:Patchouli:1.21-${project.patchouli_version}")
   localRuntime "top.theillusivec4.curios:curios-neoforge:${project.curios_version}"
-  localRuntime compileOnly ("com.hollingsworth.ars_nouveau:ars_nouveau-${project.minecraft_version}:${project.ars_version}.765")
+  localRuntime compileOnly ("com.hollingsworth.ars_nouveau:ars_nouveau-${project.minecraft_version}:${project.ars_version}.841")
 
   // JEI 10
   compileOnly ("mezz.jei:jei-${project.minecraft_version}-neoforge-api:${project.jei_version}")

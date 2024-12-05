@@ -2,6 +2,7 @@ package es.degrassi.custommachineryars.components;
 
 import com.hollingsworth.arsnouveau.api.source.AbstractSourceMachine;
 import com.hollingsworth.arsnouveau.api.source.ISourceTile;
+import com.hollingsworth.arsnouveau.client.particle.ParticleColor;
 import com.hollingsworth.arsnouveau.client.particle.ParticleUtil;
 import es.degrassi.custommachineryars.Registration;
 import es.degrassi.custommachineryars.client.integration.jei.source.Source;
@@ -78,11 +79,6 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
   @Override
   public int getMaxSource() {
     return capacity;
-  }
-
-  @Override
-  public void setMaxSource(int max) {
-
   }
 
   public int setSource(int source) {
@@ -204,6 +200,10 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
     container.accept(IntegerSyncable.create(() -> this.source, mana -> this.source = mana));
   }
 
+  private ParticleColor getParticleColor() {
+    return ParticleColor.defaultParticleColor();
+  }
+
   @Override
   public void serverTick() {
     IWandableMachineTile wandableMachine = (IWandableMachineTile) manager.getTile();
@@ -215,7 +215,8 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
             wandableMachine.cma$setFromPos(null);
           } else {
             if (wandableMachine.cma$transferSource(tile.getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).get(), this) > 0) {
-              ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getFromPos(), manager.getTile().getBlockPos());
+              ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getFromPos(),
+                  manager.getTile().getBlockPos(), getParticleColor());
             }
           }
           manager.markDirty();
@@ -227,7 +228,8 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
         // Transfer mana fromPos to this
         if (wandableMachine.cma$transferSource(fromTile, this) > 0) {
           manager.markDirty();
-          ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getFromPos(), manager.getTile().getBlockPos());
+          ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getFromPos(),
+              manager.getTile().getBlockPos(), getParticleColor());
         }
       }
     }
@@ -239,7 +241,8 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
             wandableMachine.cma$setToPos(null);
           } else {
             if (wandableMachine.cma$transferSource(tile.getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).get(), this) > 0) {
-              ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getToPos(), manager.getTile().getBlockPos());
+              ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getToPos(),
+                  manager.getTile().getBlockPos(), getParticleColor());
             }
           }
           manager.markDirty();
@@ -250,7 +253,8 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
         return;
       }
       if (wandableMachine.cma$transferSource(this, toTile) > 0) {
-        ParticleUtil.spawnFollowProjectile(manager.getLevel(), manager.getTile().getBlockPos(), wandableMachine.cma$getToPos());
+        ParticleUtil.spawnFollowProjectile(manager.getLevel(), manager.getTile().getBlockPos(),
+            wandableMachine.cma$getToPos(), getParticleColor());
       }
     }
   }

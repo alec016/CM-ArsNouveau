@@ -10,6 +10,7 @@ import fr.frinn.custommachinery.api.guielement.IComponentGuiElement;
 import fr.frinn.custommachinery.api.guielement.IGuiElement;
 import fr.frinn.custommachinery.impl.guielement.AbstractGuiElement;
 import fr.frinn.custommachinery.impl.guielement.AbstractTexturedGuiElement;
+import fr.frinn.custommachinery.impl.util.TextureInfo;
 import net.minecraft.resources.ResourceLocation;
 
 public class SourceGuiElement extends AbstractTexturedGuiElement implements IComponentGuiElement<SourceMachineComponent> {
@@ -25,7 +26,7 @@ public class SourceGuiElement extends AbstractTexturedGuiElement implements ICom
   private final boolean highlight;
 
   public SourceGuiElement(Properties properties, boolean highlight) {
-    super(properties, BASE_SOURCE_STORAGE_EMPTY_TEXTURE);
+    super(properties, new TextureInfo(BASE_SOURCE_STORAGE_EMPTY_TEXTURE));
     this.highlight = highlight;
   }
 

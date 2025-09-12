@@ -54,14 +54,28 @@ public class CustommachineryArs {
           return;
         }
         if (data.storedPos().isPresent() && player.getCommandSenderWorld().getBlockEntity(data.storedPos().get().pos()) instanceof IWandable wandable) {
-          wandable.onFinishedConnectionFirst(data.storedPos().get(), (LivingEntity) player.level().getEntity(data.storedEntityId()), player);
+          wandable.onFirstConnection(
+              data.storedPos().get(),
+              event.getFace(),
+              (LivingEntity) event.getLevel().getEntity(data.storedEntityId()),
+              player
+          );
         }
         if (tile instanceof IWandable wandable) {
-          wandable.onFinishedConnectionLast(data.storedPos().get(), (LivingEntity) player.level().getEntity(data.storedEntityId()), player);
+          wandable.onLastConnection(
+              data.storedPos().get(),
+              event.getFace(),
+              (LivingEntity) event.getLevel().getEntity(data.storedEntityId()),
+              player);
           tile.getComponentManager().markDirty();
         }
-        if (data.storedEntityId() != -1 && player.level().getEntity(data.storedEntityId()) instanceof IWandable wandable) {
-          wandable.onFinishedConnectionFirst(event.getPos(), null, player);
+        if (data.storedEntityId() != -1 && event.getLevel().getEntity(data.storedEntityId()) instanceof IWandable wandable) {
+          wandable.onLastConnection(
+              new GlobalPos(event.getLevel().dimension(), event.getPos().immutable()),
+              event.getFace(),
+              null,
+              player
+          );
         }
         wand.clear(stack, player);
         event.setCancellationResult(InteractionResult.CONSUME);

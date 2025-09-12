@@ -5,7 +5,6 @@ import es.degrassi.custommachineryars.client.integration.jei.source.SourceIngred
 import es.degrassi.custommachineryars.CustommachineryArs;
 import fr.frinn.custommachinery.client.integration.jei.DummyIngredientRenderer;
 import java.util.ArrayList;
-import java.util.Collections;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.registration.IModIngredientRegistration;

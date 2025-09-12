@@ -1,6 +1,5 @@
 package es.degrassi.custommachineryars.mixin;
 
-import com.hollingsworth.arsnouveau.api.client.ITooltipProvider;
 import com.hollingsworth.arsnouveau.api.item.IWandable;
 import com.hollingsworth.arsnouveau.api.source.AbstractSourceMachine;
 import com.hollingsworth.arsnouveau.api.source.ISourceTile;
@@ -12,6 +11,7 @@ import com.hollingsworth.arsnouveau.client.particle.ParticleUtil;
 import com.hollingsworth.arsnouveau.common.block.tile.RelayTile;
 import com.hollingsworth.arsnouveau.common.items.DominionWand;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
+import com.hollingsworth.nuggets.client.overlay.IWorldTooltipProvider;
 import es.degrassi.custommachineryars.Registration;
 import es.degrassi.custommachineryars.util.IWandableMachineTile;
 import fr.frinn.custommachinery.api.component.IMachineComponentManager;
@@ -39,7 +39,7 @@ import java.util.Objects;
 
 @SuppressWarnings("deprecation, unused")
 @Mixin({CustomMachineTile.class})
-public abstract class CustomMachineTileMixin extends MachineTile implements IWandable, ITooltipProvider, IWandableMachineTile {
+public abstract class CustomMachineTileMixin extends MachineTile implements IWandable, IWorldTooltipProvider, IWandableMachineTile {
 
   @Shadow
   public abstract IMachineComponentManager getComponentManager();
@@ -164,9 +164,10 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   }
 
   @Override
-  public void onWanded(Player playerEntity) {
+  public Result onClearConnections(Player playerEntity) {
     this.cma$clearPos();
     PortUtil.sendMessage(playerEntity, Component.translatable("ars_nouveau.connections.cleared"));
+    return Result.CLEAR;
   }
 
   @Override

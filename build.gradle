@@ -3,7 +3,7 @@ plugins {
   id 'java-library'
   id 'maven-publish'
   id 'idea'
-  id 'me.shedaniel.unified-publishing' version '0.1.+'
+  id "es.degrassi.unified-publishing-with-mmr-bot" version "1+"
   id 'net.neoforged.gradle.userdev' version '7.0.165'
 }
 
@@ -78,7 +78,7 @@ repositories {
   maven { url = "https://repo.spongepowered.org/repository/maven-public/" }
   maven {
     name = "Custom Machinery maven"
-    url = "https://maven.frinn.fr/repository/maven/"
+    url = "https://maven.frinn.fr/releases"
     content {
       includeGroup "frinn.custommachinery"
     }
@@ -100,7 +100,7 @@ repositories {
   }
   maven {
     name = "Lat's maven"
-    url = "https://maven.saps.dev/releases"
+    url = "https://maven.latvian.dev/releases"
     content {
       includeGroup "dev.latvian.mods"
       includeGroup "dev.latvian.apps"
@@ -122,6 +122,7 @@ repositories {
       includeGroup "org.openzen.zencode"
       includeGroup "mezz.jei"
       includeGroup "com.hollingsworth.ars_nouveau"
+      includeGroup "com.hollingsworth.nuggets"
       includeGroup "vazkii.patchouli"
     }
   }
@@ -171,9 +172,10 @@ dependencies {
   implementation ("io.github.llamalad7:mixinextras-neoforge:0.4.1")
   // ars
   localRuntime ("software.bernie.geckolib:geckolib-neoforge-${minecraft_version}:${geckolib_version}")
-  localRuntime ("vazkii.patchouli:Patchouli:1.21-${project.patchouli_version}")
+  localRuntime compileOnly ("com.hollingsworth.nuggets:nuggets-neoforge-1.21:${project.nuggets_version}")
+  localRuntime ("vazkii.patchouli:Patchouli:1.21.1-${project.patchouli_version}")
   localRuntime "top.theillusivec4.curios:curios-neoforge:${project.curios_version}"
-  localRuntime compileOnly ("com.hollingsworth.ars_nouveau:ars_nouveau-${project.minecraft_version}:${project.ars_version}.841")
+  localRuntime compileOnly ("com.hollingsworth.ars_nouveau:ars_nouveau-${project.minecraft_version}:${project.ars_version}.1214")
 
   // JEI 10
   compileOnly ("mezz.jei:jei-${project.minecraft_version}-neoforge-api:${project.jei_version}")
@@ -231,7 +233,7 @@ idea {
   }
 }
 
-unifiedPublishing {
+unifiedPublishingWithMMRBot {
   project {
     displayName = "Custom-Machinery-ArsNouveau-${project.minecraft_version}-${project.mod_version}"
     releaseType = "release"
@@ -241,6 +243,8 @@ unifiedPublishing {
     gameVersions = ["1.21", "1.21.1"]
     gameLoaders = ["neoforge"]
     mainPublication jar
+    modid = "custom_machinery_ars"
+    modVersion = "Custom-Machinery-ArsNouveau-${project.minecraft_version}-${project.mod_version}"
 
     var CURSE_API_KEY = System.getenv("CURSEFORGE")
     if (CURSE_API_KEY != null) {
@@ -254,6 +258,54 @@ unifiedPublishing {
           optional "crafttweaker"
           optional "kubejs"
         }
+      }
+    }
+  }
+}
+
+// Example configuration to allow publishing using the maven-publish plugin
+publishing {
+  publications {
+    register('mavenJava', MavenPublication) {
+      groupId = maven_group
+      artifactId = archivesBaseName
+      version = project.version
+      from components.java
+
+      pom {
+        name = mod_name
+        description = mod_description
+        packaging = 'jar'
+        scm {
+          url = mod_github
+        }
+        issueManagement {
+          system = 'github'
+          url = mod_issues
+        }
+        licenses {
+          license {
+            name = mod_license
+            distribution = 'repo'
+          }
+        }
+        developers {
+          developer {
+            id = mod_authors
+            name = mod_authors
+            roles = ['developper']
+          }
+        }
+      }
+    }
+  }
+  repositories {
+    maven {
+      name = 'maven'
+      url = 'https://maven.degrassi.es/releases'
+      credentials {
+        username = "Alec_016GG"
+        password = System.getenv("MAVEN_PASSWORD")
       }
     }
   }

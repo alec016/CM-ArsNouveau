@@ -1,7 +1,6 @@
 package es.degrassi.custommachineryars.components;
 
 import com.hollingsworth.arsnouveau.api.source.AbstractSourceMachine;
-import com.hollingsworth.arsnouveau.api.source.ISourceTile;
 import com.hollingsworth.arsnouveau.client.particle.ParticleColor;
 import com.hollingsworth.arsnouveau.client.particle.ParticleUtil;
 import es.degrassi.custommachineryars.Registration;
@@ -31,9 +30,11 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("unused")
 public class SourceMachineComponent implements IMachineComponent, ITickableComponent, ISerializableComponent,
-    IComparatorInputComponent, IDumpComponent, ISyncableStuff, ISourceTile {
+    IComparatorInputComponent, IDumpComponent, ISyncableStuff, ISourceCapExtension {
   private int source;
-  private final int capacity, maxIn, maxOut;
+  private int capacity;
+  private final int maxIn;
+  private final int maxOut;
   private final IMachineComponentManager manager;
 
   public SourceMachineComponent(IMachineComponentManager manager) {
@@ -52,7 +53,6 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
     return (int) (15 * ((double) this.source / (double) this.capacity));
   }
 
-  @Override
   public int getTransferRate() {
     return switch (getMode()) {
       case INPUT -> maxIn;
@@ -62,14 +62,32 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
     };
   }
 
-  @Override
   public boolean canAcceptSource() {
     return true;
   }
 
-  @Override
   public boolean canProvideSource() {
     return this.getSource() > 0;
+  }
+
+  @Override
+  public boolean canAcceptSource(int source) {
+    return getSource() + source <= getSourceCapacity();
+  }
+
+  @Override
+  public boolean canProvideSource(int source) {
+    return getSource() >= source;
+  }
+
+  @Override
+  public int getMaxExtract() {
+    return getTransferRate();
+  }
+
+  @Override
+  public int getMaxReceive() {
+    return getTransferRate();
   }
 
   public int getSource() {
@@ -77,22 +95,29 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
   }
 
   @Override
+  public int getSourceCapacity() {
+    return getMaxSource();
+  }
+
+  @Override
   public int getMaxSource() {
     return capacity;
   }
 
-  public int setSource(int source) {
+  public void setSource(int source) {
     this.source = source;
     getManager().markDirty();
-    return source;
   }
 
   @Override
+  public void setMaxSource(int max) {
+    this.capacity = max;
+  }
+
   public int addSource(int source) {
     return receiveSource(source);
   }
 
-  @Override
   public int removeSource(int source) {
     return extractSource(source);
   }

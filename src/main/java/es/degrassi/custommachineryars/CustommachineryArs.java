@@ -4,6 +4,7 @@ import com.hollingsworth.arsnouveau.api.item.IWandable;
 import com.hollingsworth.arsnouveau.common.items.DominionWand;
 import com.hollingsworth.arsnouveau.common.items.data.DominionWandData;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
+import com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry;
 import com.hollingsworth.arsnouveau.setup.registry.DataComponentRegistry;
 import fr.frinn.custommachinery.common.init.CustomMachineTile;
 import net.minecraft.core.GlobalPos;
@@ -14,6 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent;
 
@@ -26,8 +28,18 @@ public class CustommachineryArs {
 
   public CustommachineryArs(final IEventBus MOD_BUS) {
     registryInit(MOD_BUS);
+    MOD_BUS.addListener(this::registerCapabilities);
 
     NeoForge.EVENT_BUS.addListener(this::handleWandClick);
+  }
+
+  private void registerCapabilities(final RegisterCapabilitiesEvent event) {
+    event.registerBlockEntity(
+        CapabilityRegistry.SOURCE_CAPABILITY,
+        fr.frinn.custommachinery.common.init.Registration.CUSTOM_MACHINE_TILE.get(),
+        (be, side) -> be.getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get())
+            .orElse(null)
+    );
   }
 
   private void registryInit(IEventBus bus) {

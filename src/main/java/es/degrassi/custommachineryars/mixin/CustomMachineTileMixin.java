@@ -13,6 +13,7 @@ import com.hollingsworth.arsnouveau.common.items.DominionWand;
 import com.hollingsworth.arsnouveau.common.util.PortUtil;
 import com.hollingsworth.nuggets.client.overlay.IWorldTooltipProvider;
 import es.degrassi.custommachineryars.Registration;
+import es.degrassi.custommachineryars.components.ISourceCapExtension;
 import es.degrassi.custommachineryars.util.IWandableMachineTile;
 import fr.frinn.custommachinery.api.component.IMachineComponentManager;
 import fr.frinn.custommachinery.api.machine.MachineTile;
@@ -137,7 +138,6 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
       } else {
         PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.fail"));
       }
-
     });
   }
 
@@ -219,6 +219,36 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   }
 
   @Override
+  public int cma$transferSource(ISourceCapExtension from, ISourceCapExtension to) {
+    int transferRate = cma$getTransferRate(from, to);
+    if (transferRate <= 0) return 0;
+    from.removeSource(transferRate);
+    to.addSource(transferRate);
+    this.getComponentManager().markDirty();
+    return transferRate;
+  }
+
+  @Override
+  public int cma$transferSource(ISourceTile from, ISourceCapExtension to) {
+    int transferRate = cma$getTransferRate(from, to);
+    if (transferRate <= 0) return 0;
+    from.removeSource(transferRate);
+    to.addSource(transferRate);
+    this.getComponentManager().markDirty();
+    return transferRate;
+  }
+
+  @Override
+  public int cma$transferSource(ISourceCapExtension from, ISourceTile to) {
+    int transferRate = cma$getTransferRate(from, to);
+    if (transferRate <= 0) return 0;
+    from.removeSource(transferRate);
+    to.addSource(transferRate);
+    this.getComponentManager().markDirty();
+    return transferRate;
+  }
+
+  @Override
   public int cma$transferSource(ISourceTile from, ISourceTile to) {
     int transferRate = cma$getTransferRate(from, to);
     if (transferRate <= 0) return 0;
@@ -231,6 +261,21 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   /**
    * Gets the maximum amount of source that can be transferred from one tile to another.
    */
+  @Override
+  public int cma$getTransferRate(ISourceCapExtension from, ISourceCapExtension to) {
+    return Math.min(Math.min(from.getTransferRate(), from.getSource()), to.getMaxSource() - to.getSource());
+  }
+
+  @Override
+  public int cma$getTransferRate(ISourceTile from, ISourceCapExtension to) {
+    return Math.min(Math.min(from.getTransferRate(), from.getSource()), to.getMaxSource() - to.getSource());
+  }
+
+  @Override
+  public int cma$getTransferRate(ISourceCapExtension from, ISourceTile to) {
+    return Math.min(Math.min(from.getTransferRate(), from.getSource()), to.getMaxSource() - to.getSource());
+  }
+
   @Override
   public int cma$getTransferRate(ISourceTile from, ISourceTile to) {
     return Math.min(Math.min(from.getTransferRate(), from.getSource()), to.getMaxSource() - to.getSource());

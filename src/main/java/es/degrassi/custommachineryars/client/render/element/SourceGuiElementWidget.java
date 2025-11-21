@@ -60,7 +60,7 @@ public class SourceGuiElementWidget extends TexturedGuiElementWidget<SourceGuiEl
 
       renderSource(poseStack.pose(), manaHeight, getX() + 2, getY() + 2, width - 4, height - 4);
     });
-    if(this.isHoveredOrFocused() && this.getElement().highlight())
+    if(this.isHovered() && this.getElement().highlight())
       ClientHandler.renderSlotHighlight(poseStack, this.getX() + 2, this.getY() + 2, this.width - 4, this.height - 4);
   }
 

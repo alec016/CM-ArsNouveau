@@ -17,7 +17,7 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 
-@EventBusSubscriber(modid = CustommachineryArs.MODID, bus = EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid = CustommachineryArs.MODID, value = Dist.CLIENT)
 public class ClientHandler {
   public static void clientInit() {
   }
@@ -45,6 +45,7 @@ public class ClientHandler {
   public static void renderSlotHighlight(GuiGraphics pose, int x, int y, int width, int height) {
     RenderSystem.disableDepthTest();
     RenderSystem.colorMask(true, true, true, false);
+    pose.pose().pushPose();
     pose.pose().translate(0, 0, 110);
     pose.fill(x, y, x + width, y + height, -2130706433);
     pose.pose().popPose();

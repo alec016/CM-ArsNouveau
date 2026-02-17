@@ -3,37 +3,37 @@ loaderVersion = "[4,)"
 license = "${license}"
 [[mods]] #mandatory
 # The modid of the mod
-modId = "custommachineryars" #mandatory
+modId = "${modid}" #mandatory
 version = "${mod_version}"
 displayName = "Custom Machinery ArsNouveau"
-logoFile = "icon.png"
+logoFile = "../../resources/icon.png"
 description = '''
 ${mod_description}
 '''
 [[mixins]]
-config="custommachineryars.mixins.json"
+config="${modid}.mixins.json"
 
-[[dependencies.custommachineryars]]
+[[dependencies.${modid}]]
 modId = "neoforge"
 mandatory = true
 versionRange = "[21.0.0,)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.custommachineryars]]
+[[dependencies.${modid}]]
 modId = "minecraft"
 mandatory = true
 versionRange = "[${minecraft_version},1.22)"
 ordering = "NONE"
 side = "BOTH"
 
-[[dependencies.custommachineryars]]
+[[dependencies.${modid}]]
 modId = "custommachinery"
 mandatory = true
 versionRange = "[${custommachinery_version},)"
 ordering = "AFTER"
 
-[[dependencies.custommachineryars]]
+[[dependencies.${modid}]]
 modId = "ars_nouveau"
 mandatory = true
 versionRange = "[${ars_version},)"

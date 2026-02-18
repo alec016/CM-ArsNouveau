@@ -131,6 +131,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
     }
 
     getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(component -> {
+      if (component.getMaxOutput() <= 0) return;
       // Let relays take from us, no action needed.
       if (this.cma$setSendTo(storedPos.immutable())) {
         PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.send", DominionWand.getPosString(storedPos)));
@@ -155,6 +156,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
     }
 
     getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(component -> {
+      if (component.getMaxInput() <= 0) return;
       if (this.cma$setTakeFrom(storedPos.immutable())) {
         PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.take", DominionWand.getPosString(storedPos)));
       } else {
@@ -263,38 +265,44 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
    */
   @Override
   public int cma$getTransferRate(ISourceCapExtension from, ISourceCapExtension to) {
-    return Math.min(Math.min(from.getTransferRate(), from.getSource()), to.getMaxSource() - to.getSource());
+    var transferMin = Math.min(from.getTransferRate(), to.getTransferRate());
+    return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
   }
 
   @Override
   public int cma$getTransferRate(ISourceTile from, ISourceCapExtension to) {
-    return Math.min(Math.min(from.getTransferRate(), from.getSource()), to.getMaxSource() - to.getSource());
+    var transferMin = Math.min(from.getTransferRate(), to.getTransferRate());
+    return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
   }
 
   @Override
   public int cma$getTransferRate(ISourceCapExtension from, ISourceTile to) {
-    return Math.min(Math.min(from.getTransferRate(), from.getSource()), to.getMaxSource() - to.getSource());
+    var transferMin = Math.min(from.getTransferRate(), to.getTransferRate());
+    return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
   }
 
   @Override
   public int cma$getTransferRate(ISourceTile from, ISourceTile to) {
-    return Math.min(Math.min(from.getTransferRate(), from.getSource()), to.getMaxSource() - to.getSource());
+    var transferMin = Math.min(from.getTransferRate(), to.getTransferRate());
+    return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
   }
 
   @Override
   public void getTooltip(List<Component> tooltip) {
     tooltip.clear();
     getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(component -> {
-      if (cma$toPos == null) {
-        tooltip.add(Component.translatable("custommachineryars.relay.no_to"));
-      } else {
-        tooltip.add(Component.translatable("custommachineryars.relay.one_to", 1));
-      }
-      if (cma$fromPos == null) {
-        tooltip.add(Component.translatable("custommachineryars.relay.no_from"));
-      } else {
-        tooltip.add(Component.translatable("custommachineryars.relay.one_from", 1));
-      }
+      if (component.getMaxOutput() > 0)
+        if (cma$toPos == null) {
+          tooltip.add(Component.translatable("custommachineryars.relay.no_to"));
+        } else {
+          tooltip.add(Component.translatable("custommachineryars.relay.one_to", 1));
+        }
+      if (component.getMaxInput() > 0)
+        if (cma$fromPos == null) {
+          tooltip.add(Component.translatable("custommachineryars.relay.no_from"));
+        } else {
+          tooltip.add(Component.translatable("custommachineryars.relay.one_from", 1));
+        }
     });
   }
 }

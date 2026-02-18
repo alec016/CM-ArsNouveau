@@ -51,10 +51,9 @@ public class CustommachineryArs {
 
   private void handleWandClick(final PlayerInteractEvent.RightClickBlock event) {
     if (event.getEntity() instanceof ServerPlayer player && !player.isShiftKeyDown()) {
-      if (player.getItemInHand(event.getHand()).getItem() instanceof DominionWand wand
-        && player.level().getBlockEntity(event.getPos()) instanceof CustomMachineTile tile) {
+      ItemStack stack = event.getItemStack();
+      if (stack.getItem() instanceof DominionWand wand && player.level().getBlockEntity(event.getPos()) instanceof CustomMachineTile tile) {
         if (!tile.getComponentManager().hasComponent(Registration.SOURCE_MACHINE_COMPONENT.get())) return;
-        ItemStack stack = player.getItemInHand(event.getHand());
         DominionWandData data = stack.getOrDefault(DataComponentRegistry.DOMINION_WAND.get(), new DominionWandData());
         if (!data.hasStoredData()) {
           data = data.storePos(new GlobalPos(event.getLevel().dimension(), event.getPos().immutable()));
@@ -80,6 +79,7 @@ public class CustommachineryArs {
               (LivingEntity) event.getLevel().getEntity(data.storedEntityId()),
               player);
           tile.getComponentManager().markDirty();
+          wand.clear(stack, player);
         }
         if (data.storedEntityId() != -1 && event.getLevel().getEntity(data.storedEntityId()) instanceof IWandable wandable) {
           wandable.onLastConnection(
@@ -88,9 +88,10 @@ public class CustommachineryArs {
               null,
               player
           );
+          wand.clear(stack, player);
         }
-        wand.clear(stack, player);
         event.setCancellationResult(InteractionResult.CONSUME);
+        event.setCanceled(true);
       }
     }
   }

@@ -17,13 +17,13 @@ public class SourceHelper {
     int itemCount = stack.getCount();
     if (tag == null) return;
     int source = tag.amount() * itemCount;
-    int received = buffer.receiveSource(source, true);
+    int received = buffer.receiveSourceRecipe(source, true);
     BlockFillContents newContent;
     if (received == source){
       newContent = new BlockFillContents(0);
-      buffer.receiveSource(source);
+      buffer.receiveSourceRecipe(source, false);
     } else {
-      buffer.receiveSource(received);
+      buffer.receiveSourceRecipe(received, false);
       newContent = new BlockFillContents((source - received) / itemCount);
     }
     stack.set(DataComponentRegistry.BLOCK_FILL_CONTENTS.get(), newContent);
@@ -40,11 +40,11 @@ public class SourceHelper {
     int possibleReceive = (stackCapacity - stackSource) * itemCount;
     int extract;
     BlockFillContents newContent;
-    if (buffer.extractSource(possibleReceive, true) == possibleReceive) {
-      buffer.extractSource(possibleReceive);
+    if (buffer.extractSourceRecipe(possibleReceive, true) == possibleReceive) {
+      buffer.extractSourceRecipe(possibleReceive, false);
       newContent = new BlockFillContents(stackCapacity);
-    } else if ((extract = buffer.extractSource(possibleReceive, true)) < possibleReceive) {
-      buffer.extractSource(extract);
+    } else if ((extract = buffer.extractSourceRecipe(possibleReceive, true)) < possibleReceive) {
+      buffer.extractSourceRecipe(extract, false);
       newContent = new BlockFillContents(stackSource + (extract / itemCount));
     } else {
       newContent = nbt;

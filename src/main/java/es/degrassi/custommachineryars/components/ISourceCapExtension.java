@@ -8,4 +8,6 @@ public interface ISourceCapExtension extends ISourceCap {
   int getTransferRate();
 
   int addSource(int transferRate);
+
+  int addSource(int transferRate, boolean simulate);
 }

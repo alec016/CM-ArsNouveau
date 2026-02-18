@@ -27,14 +27,16 @@ import net.minecraft.nbt.Tag;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @SuppressWarnings("unused")
 public class SourceMachineComponent implements IMachineComponent, ITickableComponent, ISerializableComponent,
     IComparatorInputComponent, IDumpComponent, ISyncableStuff, ISourceCapExtension {
   private int source;
-  private int capacity;
-  private final int maxIn;
-  private final int maxOut;
+  private int clientCapacity;
+  private final Supplier<Integer> capacity;
+  private final Supplier<Integer> maxIn;
+  private final Supplier<Integer> maxOut;
   private final IMachineComponentManager manager;
 
   public SourceMachineComponent(IMachineComponentManager manager) {
@@ -43,21 +45,31 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
 
   public SourceMachineComponent(IMachineComponentManager manager, int capacity, int maxIn, int maxOut) {
     this.manager = manager;
-    this.capacity = capacity;
-    this.maxIn = Math.min(maxIn, capacity);
-    this.maxOut = Math.min(maxOut, capacity);
+    this.capacity = upgradeableI(capacity, "capacity", 1, v -> this.source = Math.min(this.source, v));
+    this.maxIn = upgradeableI(maxIn, "max_input");
+    this.maxOut = upgradeableI(maxIn, "max_output");
+    this.clientCapacity = capacity;
+  }
+
+  private Supplier<Integer> upgradeableI(int defaultValue, String target, int min, Consumer<Integer> onChange) {
+    Supplier<Double> supplier = this.getManager().addUpgradeableComponentValue(this, target, defaultValue, min, Integer.MAX_VALUE, value -> onChange.accept(value.intValue()));
+    return () -> supplier.get().intValue();
+  }
+
+  private Supplier<Integer> upgradeableI(int defaultValue, String target) {
+    return this.upgradeableI(defaultValue, target, 0, value -> {});
   }
 
   @Override
   public int getComparatorInput() {
-    return (int) (15 * ((double) this.source / (double) this.capacity));
+    return (int) (15 * ((double) this.source / (double) this.capacity.get()));
   }
 
   public int getTransferRate() {
     return switch (getMode()) {
-      case INPUT -> maxIn;
-      case OUTPUT -> maxOut;
-      case BOTH -> Math.min(maxIn, maxOut);
+      case INPUT -> maxIn.get();
+      case OUTPUT -> maxOut.get();
+      case BOTH -> Math.min(maxIn.get(), maxOut.get());
       case NONE -> 0;
     };
   }
@@ -82,12 +94,12 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
 
   @Override
   public int getMaxExtract() {
-    return getTransferRate();
+    return maxOut.get();
   }
 
   @Override
   public int getMaxReceive() {
-    return getTransferRate();
+    return maxIn.get();
   }
 
   public int getSource() {
@@ -101,7 +113,7 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
 
   @Override
   public int getMaxSource() {
-    return capacity;
+    return capacity.get();
   }
 
   public void setSource(int source) {
@@ -111,11 +123,16 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
 
   @Override
   public void setMaxSource(int max) {
-    this.capacity = max;
+    this.clientCapacity = max;
   }
 
   public int addSource(int source) {
     return receiveSource(source);
+  }
+
+  @Override
+  public int addSource(int transferRate, boolean simulate) {
+    return receiveSource(transferRate, simulate);
   }
 
   public int removeSource(int source) {
@@ -169,23 +186,23 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
   }
 
   public double getFillPercent() {
-    return (double) this.source / this.capacity;
+    return (double) this.source / this.capacity.get();
   }
 
   public boolean isFull() {
-    return this.capacity == this.source;
+    return this.capacity.get() == this.source;
   }
 
   public int getCapacity() {
-    return this.capacity;
+    return this.capacity.get();
   }
 
   public int getMaxInput() {
-    return maxIn;
+    return maxIn.get();
   }
 
   public int getMaxOutput() {
-    return maxOut;
+    return maxOut.get();
   }
 
   @Override
@@ -202,7 +219,7 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
   @Override
   public void deserialize(CompoundTag nbt, HolderLookup.Provider registries) {
     if (nbt.contains("source", Tag.TAG_INT))
-      this.source = Math.min(nbt.getInt("source"), this.capacity);
+      this.source = Math.min(nbt.getInt("source"), this.capacity.get());
   }
 
   @Override
@@ -223,6 +240,7 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
   @Override
   public void getStuffToSync(Consumer<ISyncable<?, ?>> container) {
     container.accept(IntegerSyncable.create(() -> this.source, mana -> this.source = mana));
+    container.accept(IntegerSyncable.create(this.capacity, v -> this.clientCapacity = v));
   }
 
   private ParticleColor getParticleColor() {

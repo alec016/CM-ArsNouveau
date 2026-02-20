@@ -65,15 +65,6 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
     return (int) (15 * ((double) this.source / (double) this.capacity.get()));
   }
 
-  public int getTransferRate() {
-    return switch (getMode()) {
-      case INPUT -> maxIn.get();
-      case OUTPUT -> maxOut.get();
-      case BOTH -> Math.min(maxIn.get(), maxOut.get());
-      case NONE -> 0;
-    };
-  }
-
   public boolean canAcceptSource() {
     return true;
   }
@@ -268,7 +259,7 @@ public class SourceMachineComponent implements IMachineComponent, ITickableCompo
         wandableMachine.cma$setFromPos(null);
         manager.markDirty();
       } else if (manager.getLevel().getBlockEntity(wandableMachine.cma$getFromPos()) instanceof AbstractSourceMachine fromTile) {
-        // Transfer mana fromPos to this
+        // Transfer source fromPos to this
         if (wandableMachine.cma$transferSource(fromTile, this) > 0) {
           manager.markDirty();
           ParticleUtil.spawnFollowProjectile(manager.getLevel(), wandableMachine.cma$getFromPos(),

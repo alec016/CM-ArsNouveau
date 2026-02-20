@@ -265,19 +265,19 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
    */
   @Override
   public int cma$getTransferRate(ISourceCapExtension from, ISourceCapExtension to) {
-    var transferMin = Math.min(from.getTransferRate(), to.getTransferRate());
+    var transferMin = Math.min(from.getMaxOutput(), to.getMaxInput());
     return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
   }
 
   @Override
   public int cma$getTransferRate(ISourceTile from, ISourceCapExtension to) {
-    var transferMin = Math.min(from.getTransferRate(), to.getTransferRate());
+    var transferMin = Math.min(from.getTransferRate(), to.getMaxInput());
     return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
   }
 
   @Override
   public int cma$getTransferRate(ISourceCapExtension from, ISourceTile to) {
-    var transferMin = Math.min(from.getTransferRate(), to.getTransferRate());
+    var transferMin = Math.min(from.getMaxOutput(), to.getTransferRate());
     return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
   }
 
@@ -291,18 +291,20 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
   public void getTooltip(List<Component> tooltip) {
     tooltip.clear();
     getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(component -> {
-      if (component.getMaxOutput() > 0)
+      if (component.getMaxOutput() > 0) {
         if (cma$toPos == null) {
           tooltip.add(Component.translatable("custommachineryars.relay.no_to"));
         } else {
           tooltip.add(Component.translatable("custommachineryars.relay.one_to", 1));
         }
-      if (component.getMaxInput() > 0)
+      }
+      if (component.getMaxInput() > 0) {
         if (cma$fromPos == null) {
           tooltip.add(Component.translatable("custommachineryars.relay.no_from"));
         } else {
           tooltip.add(Component.translatable("custommachineryars.relay.one_from", 1));
         }
+      }
     });
   }
 }

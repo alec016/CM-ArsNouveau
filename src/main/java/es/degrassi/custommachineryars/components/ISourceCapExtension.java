@@ -4,6 +4,7 @@ import com.hollingsworth.arsnouveau.api.source.ISourceCap;
 
 public interface ISourceCapExtension extends ISourceCap {
   int removeSource(int transferRate);
+  int removeSource(int transferRate, boolean simulate);
 
   int getMaxInput();
   int getMaxOutput();

@@ -2,6 +2,7 @@ package es.degrassi.custommachineryars.mixin;
 
 import com.hollingsworth.arsnouveau.api.item.IWandable;
 import com.hollingsworth.arsnouveau.api.source.AbstractSourceMachine;
+import com.hollingsworth.arsnouveau.api.source.ISourceCap;
 import com.hollingsworth.arsnouveau.api.source.ISourceTile;
 import com.hollingsworth.arsnouveau.api.util.BlockUtil;
 import com.hollingsworth.arsnouveau.api.util.NBTUtil;
@@ -159,6 +160,7 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
       if (component.getMaxInput() <= 0) return;
       if (this.cma$setTakeFrom(storedPos.immutable())) {
         PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.take", DominionWand.getPosString(storedPos)));
+        ParticleUtil.beam(worldPosition, storedPos, level);
       } else {
         PortUtil.sendMessage(playerEntity, Component.translatable("custommachineryars.connections.fail"));
       }
@@ -265,46 +267,55 @@ public abstract class CustomMachineTileMixin extends MachineTile implements IWan
    */
   @Override
   public int cma$getTransferRate(ISourceCapExtension from, ISourceCapExtension to) {
-    var transferMin = Math.min(from.getMaxOutput(), to.getMaxInput());
-    return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
+    return Math.min(
+        from.removeSource(Integer.MAX_VALUE, true),
+        to.addSource(Integer.MAX_VALUE, true)
+    );
+  }
+
+  @Override
+  public int cma$transferSource(ISourceCap from, ISourceCapExtension to) {
+    return Math.min(
+        from.extractSource(Integer.MAX_VALUE, true),
+        to.addSource(Integer.MAX_VALUE, true)
+    );
+  }
+
+  @Override
+  public int cma$transferSource(ISourceCapExtension from, ISourceCap to) {
+    return Math.min(
+        from.removeSource(Integer.MAX_VALUE, true),
+        to.receiveSource(Integer.MAX_VALUE, true)
+    );
   }
 
   @Override
   public int cma$getTransferRate(ISourceTile from, ISourceCapExtension to) {
-    var transferMin = Math.min(from.getTransferRate(), to.getMaxInput());
-    return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
+    return Math.min(
+        from.removeSource(Integer.MAX_VALUE, true),
+        to.addSource(Integer.MAX_VALUE, true)
+    );
   }
 
   @Override
   public int cma$getTransferRate(ISourceCapExtension from, ISourceTile to) {
-    var transferMin = Math.min(from.getMaxOutput(), to.getTransferRate());
-    return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
+    return Math.min(
+        from.removeSource(Integer.MAX_VALUE, true),
+        to.addSource(Integer.MAX_VALUE, true)
+    );
   }
 
   @Override
   public int cma$getTransferRate(ISourceTile from, ISourceTile to) {
-    var transferMin = Math.min(from.getTransferRate(), to.getTransferRate());
-    return Math.min(Math.min(transferMin, from.getSource()), to.addSource(Integer.MAX_VALUE, true));
+    return Math.min(
+        from.removeSource(Integer.MAX_VALUE, true),
+        to.addSource(Integer.MAX_VALUE, true)
+    );
   }
 
   @Override
   public void getTooltip(List<Component> tooltip) {
-    tooltip.clear();
-    getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get()).ifPresent(component -> {
-      if (component.getMaxOutput() > 0) {
-        if (cma$toPos == null) {
-          tooltip.add(Component.translatable("custommachineryars.relay.no_to"));
-        } else {
-          tooltip.add(Component.translatable("custommachineryars.relay.one_to", 1));
-        }
-      }
-      if (component.getMaxInput() > 0) {
-        if (cma$fromPos == null) {
-          tooltip.add(Component.translatable("custommachineryars.relay.no_from"));
-        } else {
-          tooltip.add(Component.translatable("custommachineryars.relay.one_from", 1));
-        }
-      }
-    });
+    getComponentManager().getComponent(Registration.SOURCE_MACHINE_COMPONENT.get())
+        .ifPresent(component -> component.getTooltip(tooltip, cma$fromPos, cma$toPos));
   }
 }

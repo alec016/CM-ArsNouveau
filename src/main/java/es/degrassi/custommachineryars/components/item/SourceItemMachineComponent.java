@@ -8,8 +8,8 @@ import fr.frinn.custommachinery.api.component.ComponentIOMode;
 import fr.frinn.custommachinery.api.component.IMachineComponentManager;
 import fr.frinn.custommachinery.api.component.ITickableComponent;
 import fr.frinn.custommachinery.api.component.MachineComponentType;
-import fr.frinn.custommachinery.api.utils.Filter;
 import fr.frinn.custommachinery.common.component.item.ItemMachineComponent;
+import fr.frinn.custommachinery.common.util.Filter;
 import fr.frinn.custommachinery.impl.component.config.IOSideConfig;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -52,7 +52,8 @@ public class SourceItemMachineComponent extends ItemMachineComponent implements 
   public static class Template extends ItemMachineComponent.Template {
     public static final NamedCodec<Template> CODEC = defaultCodec(Template::new, "Source item machine component");
 
-    public Template(String id, ComponentIOMode mode, int capacity, Optional<Integer> maxInput, Optional<Integer> maxOutput, Filter<Item> filter, Optional<IOSideConfig.Template> config, boolean locked) {
+    public Template(String id, ComponentIOMode mode, int capacity, int maxInput, int maxOutput,
+                    Filter<Item> filter, IOSideConfig.Template config, boolean locked) {
       super(id, mode, capacity, maxInput, maxOutput, filter, config, locked);
     }
 
